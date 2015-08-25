@@ -1,0 +1,113 @@
+* {
+	box-sizing: border-box;
+}
+html {
+	height: 100%;
+}
+body {
+	background: #000;
+	color: #FFF;
+	font-family: "Lucida Grande", Helvetica, Arial, sans-serif;
+	font-size: 10px;
+	height: 100%;
+	width: 100%;
+	padding-top: 10%;
+} 
+#board {
+	/*display: flex;
+	flex-flow: row wrap;
+	align-items: expand;*/
+	width: 90%;
+	height: 90%;
+	margin: 0 auto;
+	background-color: #FFF;
+	color: #000;
+	position: relative;
+}
+#board table {
+	border-collapse: collapse;
+	width: 100%;
+	height: 100%;
+	display: none;
+	background-image: url('../assets/rebus.JPG');
+}
+#static-sections div {
+	width: 100%;
+	height: 100%;
+	position: absolute;
+	background-color: #fff;
+	color: #000;
+	display: none;
+	z-index: 2;
+	font-size: 8em;
+	text-align: center;
+}
+#question-view {
+	width: 100%;
+	height: 100%;
+	position: absolute;
+	background-color: #fff;
+	color: #000;
+	display: none;
+	z-index: 2;
+	font-size: 8em;
+	text-align: center;
+}
+#question-text {
+	margin: .5em 0;
+}
+#question-answer {
+	margin: .5em 0;
+	color: #00F;
+}
+#question-interaction {
+	position: absolute;
+	bottom: .5em;
+	width: 100%;
+}
+#question-interaction span {
+	display: inline-block;
+	margin: 0 .5em;
+	cursor: pointer;
+}
+.square {
+	width: 25%;
+	height: 25%;
+	background-color: #d9edf7;
+	text-align: center;
+	padding: .85em .16em;
+	/*margin: .16em;*/
+	border: .04em solid #000;
+	font-size: 6em;
+	cursor: pointer;
+	flex-grow: 1;
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+.square.question-answered {
+	visibility: hidden;
+}
+h3 {
+	margin: -2em auto 1em;
+	font-size: 6em;
+	text-align: center;
+	font-weight: bold;
+	font-family: "Century Gothic", sans-serif;
+}
+#controls {
+	position: absolute;
+	bottom: 0;
+	width: 100%;
+}
+#next-section {
+	position: absolute;
+	right: -5%;
+	color: #fff;
+	font-weight: bold;
+	font-size: 6em;
+	cursor: pointer;
+}
