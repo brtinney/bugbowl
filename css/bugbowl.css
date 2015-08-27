@@ -111,3 +111,12 @@ h3 {
 	font-size: 6em;
 	cursor: pointer;
 }
+#reset-game {
+	position: absolute;
+	left: -5%;
+	top: .5em;
+	color: #fff;
+	font-weight: bold;
+	font-size: 3em;
+	cursor: pointer;
+}

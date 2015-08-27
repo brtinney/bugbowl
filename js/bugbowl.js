@@ -47,24 +47,58 @@ $(function() {
 	$('#next-section').on('click', function() {
 		if(section >= 0) {
 			if(sections[section].indexOf('-') < 0) {
-				$('#'+sections[section]).fadeOut(1000);
+				$('#'+sections[section]).fadeOut(100);
 			}
 			else {
+				var saved_section = section;
 				// Special logic for game boards
-				$('#board table').fadeOut(1000);
-				$('.square').removeClass('question-answered');
-				hidden_squares = [];
-				localStorage.hidden_squares = JSON.stringify(hidden_squares);
+				$('#board table').fadeOut(100, function() {
+					$('.square').removeClass('question-answered');
+					hidden_squares = [];
+					localStorage.hidden_squares = JSON.stringify(hidden_squares);
+					if(mode == 'rebus_reveal' && sections[saved_section].split('-').pop() == '3') {
+						mode = 'point_value';
+						localStorage.mode = mode;
+						$('#board tr:nth-child(1) td').text('100');
+						$('#board tr:nth-child(2) td').text('200');
+						$('#board tr:nth-child(3) td').text('300');
+						$('#board tr:nth-child(4) td').text('500');
+					}
+					else if(mode == 'point_value' && sections[saved_section].split('-').pop() == '3') {
+						mode = 'rebus_reveal';
+						localStorage.mode = mode;
+						$('.square').each(function(index) {
+							$(this).text(index);
+						});
+					}
+				});
 			}
 		}
 		section++;
 		localStorage.section = section;
 
+		if(section >= sections.length) {
+			resetStorage();
+			$('#next-section').hide();
+			return;
+		}
+
 		if(sections[section].indexOf('-') < 0) {
-			$('#'+sections[section]).delay(1000).fadeIn(1000);
+			$('#'+sections[section]).delay(100).fadeIn(100);
 		}
 		else {
-			$('#board table').delay(1000).fadeIn(1000, function() {
+			if(mode == "point_value") {
+				$('#board tr:nth-child(1) td').text('100');
+				$('#board tr:nth-child(2) td').text('200');
+				$('#board tr:nth-child(3) td').text('300');
+				$('#board tr:nth-child(4) td').text('500');
+			}
+			else {
+				$('.square').each(function(index) {
+					$(this).text(index);
+				});
+			}
+			$('#board table').delay(100).fadeIn(100, function() {
 				$('#'+hidden_squares.join(',#')).addClass('question-answered');
 				if(square) {
 					// This is in case of restoring state
@@ -74,5 +108,18 @@ $(function() {
 		}
 	});
 
+	$('#reset-game').on('click', function() {
+		resetStorage();
+		location.reload();
+	});
+
 	$('#next-section').click();
 });
+
+function resetStorage() {
+	localStorage.removeItem('question_index');
+	localStorage.removeItem('square');
+	localStorage.removeItem('hidden_squares');
+	localStorage.removeItem('mode');
+	localStorage.removeItem('section');
+}
