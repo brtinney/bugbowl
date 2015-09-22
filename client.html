@@ -3,13 +3,119 @@
     <head>
         <meta charset="utf-8">
         <meta http-equiv="x-ua-compatible" content="ie=edge">
-        <title></title>
+        <title>BugBowl 2015</title>
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="css/reset.css" type="text/css">
+        <link rel="stylesheet" href="css/bugbowl.css" type="text/css">
     </head>
     <body>
+        <h3>BUGBOWL</h3>
+        <div id="board">
+            <div id="static-sections">
+                <div id="splash">
+                    WELCOME TO BUGBOWL
+                </div>
+                <div id="intro">
+                    {THIS IS A FLASH VIDEO INTRO}
+                </div>
+                <div id="rebus_rules">
+                    Some rules about rebuses
+                </div>
+                <div id="audience">
+                    Hey audience, it's your turn!
+                </div>
+                <div id="transition">
+                    {THIS IS A FLASH VIDEO TRANSITION}
+                </div>
+                <div id="point_rules">
+                    Some rules about the point stuff
+                </div>
+                <div id="final_transition">
+                    {THIS IS THE LAST FLASH VIDEO TRANSITION}
+                </div>
+                <div id="final_rules">
+                    These are the final rules
+                </div>
+                <div id="final">
+                    Super hard problem that takes time here
+                </div>
+            </div>
+            <div id="question-view">
+                <div id="question-text"></div>
+                <div id="question-answer"></div>
+                <div id="question-interaction">
+                    <span id="question-correct">&#9989;</span>
+                    <span id="question-wrong">&#10062;</span>
+                </div>
+            </div>
+            <table>
+                <tr>
+                    <td id="square-0" class="square">0</td>
+                    <td id="square-1" class="square">1</td>
+                    <td id="square-2" class="square">2</td>
+                    <td id="square-3" class="square">3</td>
+                </tr>
+                <tr>
+                    <td id="square-4" class="square">4</td>
+                    <td id="square-5" class="square">5</td>
+                    <td id="square-6" class="square">6</td>
+                    <td id="square-7" class="square">7</td>
+                </tr>
+                <tr>
+                    <td id="square-8" class="square">8</td>
+                    <td id="square-9" class="square">9</td>
+                    <td id="square-10" class="square">10</td>
+                    <td id="square-11" class="square">11</td>
+                </tr>
+                <tr>
+                    <td id="square-12" class="square">12</td>
+                    <td id="square-13" class="square">13</td>
+                    <td id="square-14" class="square">14</td>
+                    <td id="square-15" class="square">15</td>
+                </tr>
+            </table>
+            <div id="controls">
+                <span id="reset-game">Reset</span>
+                <span id="next-section">&raquo;</span>
+            </div>
+        </div>
+        <script src="js/jquery-2.1.4.min.js"></script>
+        <script src="assets/questions.js"></script>
+        <script src="js/bugbowl.js"></script>
         <script>
-            setInterval(function() { console.log(localStorage.getItem('bugbowlVersion')); }, 1200);
+            server = 0;
+            var loop = setInterval(
+                function()
+                {
+                    var event = JSON.parse(localStorage.bugbowl_event);
+                    localStorage.bugbowl_event = '';
+                    if(event.type == "square")
+                    {
+                        $('#'+event.id).trigger('click');
+                    }
+                    else if(event.type == "question-correct")
+                    {
+                        $('#question-correct').trigger('click');
+                    }
+                    else if(event.type == "question-wrong")
+                    {
+                        $('#question-wrong').trigger('click');
+                    }
+                    else if(event.type == "next-section")
+                    {
+                        $('#next-section').trigger('click');
+                    }
+                    else if(event.type == "reset-game")
+                    {
+                        // Sometimes the loop is faster, so just make sure
+                        localStorage.bugbowl_event = 'reset-game';
+                        clearTimeout(loop);
+                        location.reload();
+                    }
+                },
+                20
+            );
         </script>
     </body>
 </html>

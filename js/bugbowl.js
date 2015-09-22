@@ -1,3 +1,4 @@
+var server = 1;
 $(function() {
 	var question_index = (localStorage.question_index) ? Number(localStorage.question_index) - 1 : -1;
 	var square = (localStorage.square) ? $('#'+localStorage.square) : null;
@@ -10,11 +11,19 @@ $(function() {
 					'final_transition','final_rules','final'];
 
 	$('.square').on('click', function() {
+		if(server)
+		{
+			localStorage.bugbowl_event = JSON.stringify({'type': 'square',
+			 											 'id': $(this).attr('id')});
+		}
 		square = $(this);
 		question_index++;
 
-		localStorage.square = square.attr('id');
-		localStorage.question_index = question_index;
+		if(server)
+		{
+			localStorage.square = square.attr('id');
+			localStorage.question_index = question_index;
+		}
 
 		$('.square').addClass('question-opened');
 		$('#question-view').fadeIn(200);
@@ -23,18 +32,37 @@ $(function() {
 	});
 
 	$('#question-correct').on('click', function() {
+		if(server)
+		{
+			localStorage.bugbowl_event = JSON.stringify({'type': 'question-correct'});
+		}
+
 		$('#question-view').fadeOut(200);
 		square.addClass('question-answered');
 		hidden_squares.push(square.attr('id'));
-		localStorage.hidden_squares = JSON.stringify(hidden_squares);
+		if(server)
+		{
+			localStorage.hidden_squares = JSON.stringify(hidden_squares);
+		}
 		square = null;
-		localStorage.square = '';
+		if(server)
+		{
+			localStorage.square = '';
+		}
 	});
 
 	$('#question-wrong').on('click', function() {
+		if(server)
+		{
+			localStorage.bugbowl_event = JSON.stringify({'type': 'question-wrong'});
+		}
+
 		$('#question-view').fadeOut(200);
 		square = null;
-		localStorage.square = '';
+		if(server)
+		{
+			localStorage.square = '';
+		}
 	});
 
 	$(window).on('keyup', function(e) {
@@ -45,6 +73,11 @@ $(function() {
 	});
 
 	$('#next-section').on('click', function() {
+		if(server)
+		{
+			localStorage.bugbowl_event = JSON.stringify({'type': 'next-section'});
+		}
+
 		if(section >= 0) {
 			if(sections[section].indexOf('-') < 0) {
 				$('#'+sections[section]).fadeOut(100);
@@ -55,10 +88,16 @@ $(function() {
 				$('#board table').fadeOut(100, function() {
 					$('.square').removeClass('question-answered');
 					hidden_squares = [];
-					localStorage.hidden_squares = JSON.stringify(hidden_squares);
+					if(server)
+					{
+						localStorage.hidden_squares = JSON.stringify(hidden_squares);
+					}
 					if(mode == 'rebus_reveal' && sections[saved_section].split('-').pop() == '3') {
 						mode = 'point_value';
-						localStorage.mode = mode;
+						if(server)
+						{
+							localStorage.mode = mode;
+						}
 						$('#board tr:nth-child(1) td').text('100');
 						$('#board tr:nth-child(2) td').text('200');
 						$('#board tr:nth-child(3) td').text('300');
@@ -66,7 +105,10 @@ $(function() {
 					}
 					else if(mode == 'point_value' && sections[saved_section].split('-').pop() == '3') {
 						mode = 'rebus_reveal';
-						localStorage.mode = mode;
+						if(server)
+						{
+							localStorage.mode = mode;
+						}
 						$('.square').each(function(index) {
 							$(this).text(index);
 						});
@@ -75,7 +117,10 @@ $(function() {
 			}
 		}
 		section++;
-		localStorage.section = section;
+		if(server)
+		{
+			localStorage.section = section;
+		}
 
 		if(section >= sections.length) {
 			resetStorage();
@@ -109,17 +154,27 @@ $(function() {
 	});
 
 	$('#reset-game').on('click', function() {
+		if(server)
+		{
+			localStorage.bugbowl_event = JSON.stringify({'type': 'reset-game'});
+		}
 		resetStorage();
 		location.reload();
 	});
 
-	$('#next-section').click();
+	if(server)
+	{
+		$('#next-section').click();
+	}
 });
 
 function resetStorage() {
-	localStorage.removeItem('question_index');
-	localStorage.removeItem('square');
-	localStorage.removeItem('hidden_squares');
-	localStorage.removeItem('mode');
-	localStorage.removeItem('section');
+	if(server)
+	{
+		localStorage.removeItem('question_index');
+		localStorage.removeItem('square');
+		localStorage.removeItem('hidden_squares');
+		localStorage.removeItem('mode');
+		localStorage.removeItem('section');
+	}
 }
