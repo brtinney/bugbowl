@@ -43,11 +43,7 @@
             </div>
             <div id="question-view">
                 <div id="question-text"></div>
-                <div id="question-answer"></div>
-                <div id="question-interaction">
-                    <span id="question-correct">&#9989;</span>
-                    <span id="question-wrong">&#10062;</span>
-                </div>
+                <div id="team-indicator"></div>
             </div>
             <table>
                 <tr>
@@ -89,10 +85,17 @@
                 function()
                 {
                     var event = JSON.parse(localStorage.bugbowl_event);
-                    localStorage.bugbowl_event = '';
+                    if(event.length <= 0) { return; }
+                    event = event.shift();
+                    localStorage.bugbowl_event = JSON.stringify(JSON.parse(localStorage.bugbowl_event).slice(1));
+
                     if(event.type == "square")
                     {
                         $('#'+event.id).trigger('click');
+                    }
+                    else if(event.type == "bugbowl-team")
+                    {
+                        $(window).trigger('bugbowl.team', event.team);
                     }
                     else if(event.type == "question-correct")
                     {
@@ -109,7 +112,7 @@
                     else if(event.type == "reset-game")
                     {
                         // Sometimes the loop is faster, so just make sure
-                        localStorage.bugbowl_event = 'reset-game';
+                        localStorage.bugbowl_event = JSON.parse(localStorage.bugbowl_event).push('reset-game');
                         clearTimeout(loop);
                         location.reload();
                     }

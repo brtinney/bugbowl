@@ -12,7 +12,7 @@ body {
 	height: 100%;
 	width: 100%;
 	padding-top: 10%;
-} 
+}
 #board {
 	/*display: flex;
 	flex-flow: row wrap;
@@ -69,6 +69,11 @@ body {
 	display: inline-block;
 	margin: 0 .5em;
 	cursor: pointer;
+}
+#team-indicator {
+	position: absolute;
+	bottom: 1em;
+	width: 100%;
 }
 .square {
 	width: 25%;

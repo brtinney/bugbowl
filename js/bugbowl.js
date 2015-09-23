@@ -4,6 +4,7 @@ $(function() {
 	var square = (localStorage.square) ? $('#'+localStorage.square) : null;
 	var hidden_squares = (localStorage.hidden_squares) ? JSON.parse(localStorage.hidden_squares) : [];
 	var mode = (localStorage.mode) ? localStorage.mode : 'rebus_reveal';
+	var team = (localStorage.team) ? localStorage.team : 0;
 	var section = (localStorage.section) ? Number(localStorage.section) - 1 : -1;
 	var sections = ['splash','intro','rebus_rules',
 					'rebus_reveal-1','rebus_reveal-2','audience','rebus_reveal-3',
@@ -13,8 +14,9 @@ $(function() {
 	$('.square').on('click', function() {
 		if(server)
 		{
-			localStorage.bugbowl_event = JSON.stringify({'type': 'square',
-			 											 'id': $(this).attr('id')});
+			localStorage.bugbowl_event = JSON.stringify(JSON.parse(localStorage.bugbowl_event)
+													   	    .concat({'type': 'square', 'id': $(this).attr('id')})
+												   	   );
 		}
 		square = $(this);
 		question_index++;
@@ -25,16 +27,30 @@ $(function() {
 			localStorage.question_index = question_index;
 		}
 
+		if(mode == 'point_value')
+		{
+			$(window).trigger('bugbowl.team', 0);
+		}
+		else
+		{
+			// Only on client
+			$('#team-indicator').text('Team '+team);
+		}
+
 		$('.square').addClass('question-opened');
 		$('#question-view').fadeIn(200);
 		$('#question-text').text(questions[mode][question_index].question);
+
+		// Only on server
 		$('#question-answer').text(questions[mode][question_index].answer);
 	});
 
 	$('#question-correct').on('click', function() {
 		if(server)
 		{
-			localStorage.bugbowl_event = JSON.stringify({'type': 'question-correct'});
+			localStorage.bugbowl_event = JSON.stringify(JSON.parse(localStorage.bugbowl_event)
+													   	    .concat({'type': 'question-correct'})
+												   	   );
 		}
 
 		$('#question-view').fadeOut(200);
@@ -54,7 +70,9 @@ $(function() {
 	$('#question-wrong').on('click', function() {
 		if(server)
 		{
-			localStorage.bugbowl_event = JSON.stringify({'type': 'question-wrong'});
+			localStorage.bugbowl_event = JSON.stringify(JSON.parse(localStorage.bugbowl_event)
+													   	    .concat({'type': 'question-wrong'})
+												   	   );
 		}
 
 		$('#question-view').fadeOut(200);
@@ -68,14 +86,62 @@ $(function() {
 	$(window).on('keyup', function(e) {
 		if($('#question-view').css('display') != 'none') {
 			if (e.which == 13) $('#question-correct').click();
-		    if (e.which == 27) $('#question-wrong').click();
+		    else if (e.which == 27) $('#question-wrong').click();
 		}
+		else {
+			if (e.which == 49)
+			{
+				$(window).trigger('bugbowl.team', 1);
+			}
+			else if (e.which == 50)
+			{
+				$(window).trigger('bugbowl.team', 2);
+			}
+			else if (e.which == 51)
+			{
+				$(window).trigger('bugbowl.team', 3);
+			}
+		}
+	});
+
+	$(window).on('bugbowl.team', function(e, t) {
+		if(server)
+		{
+			localStorage.bugbowl_event = JSON.stringify(JSON.parse(localStorage.bugbowl_event)
+													   	    .concat({'type': 'bugbowl-team', 'team': t})
+												   	   );
+		}
+
+		team = t;
+		if(server)
+		{
+			localStorage.team = t;
+		}
+
+		if(mode == 'point_value' && team > 0)
+		{
+			// Only on client
+			$('#team-indicator').text('Team '+team);
+		}
+		else
+		{
+			//Only on client
+			$('#team-indicator').text('');
+		}
+	});
+
+	$(window).on('reload', function(e) {
+		localStorage.bugbowl_event = JSON.stringify(JSON.parse(localStorage.bugbowl_event)
+														.concat({'type': 'reset-game'})
+												   );
 	});
 
 	$('#next-section').on('click', function() {
 		if(server)
 		{
-			localStorage.bugbowl_event = JSON.stringify({'type': 'next-section'});
+			localStorage.bugbowl_event = JSON.stringify(JSON.parse(localStorage.bugbowl_event)
+													   	    .concat({'type': 'next-section'})
+												   	   );
 		}
 
 		if(section >= 0) {
@@ -156,7 +222,9 @@ $(function() {
 	$('#reset-game').on('click', function() {
 		if(server)
 		{
-			localStorage.bugbowl_event = JSON.stringify({'type': 'reset-game'});
+			localStorage.bugbowl_event = JSON.stringify(JSON.parse(localStorage.bugbowl_event)
+													   	    .concat({'type': 'reset-game'})
+												   	   );
 		}
 		resetStorage();
 		location.reload();
@@ -164,6 +232,7 @@ $(function() {
 
 	if(server)
 	{
+		localStorage.bugbowl_event = '[]';
 		$('#next-section').click();
 	}
 });
@@ -175,6 +244,7 @@ function resetStorage() {
 		localStorage.removeItem('square');
 		localStorage.removeItem('hidden_squares');
 		localStorage.removeItem('mode');
+		localStorage.removeItem('team');
 		localStorage.removeItem('section');
 	}
 }
