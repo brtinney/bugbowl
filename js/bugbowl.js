@@ -164,10 +164,7 @@ $(function() {
 						{
 							localStorage.mode = mode;
 						}
-						$('#board tr:nth-child(1) td').text('100');
-						$('#board tr:nth-child(2) td').text('200');
-						$('#board tr:nth-child(3) td').text('300');
-						$('#board tr:nth-child(4) td').text('500');
+						$('#board td').each(function() { $(this).text($(this).closest('tr').data('value')); });
 					}
 					else if(mode == 'point_value' && sections[saved_section].split('-').pop() == '3') {
 						mode = 'rebus_reveal';
