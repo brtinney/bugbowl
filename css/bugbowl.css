@@ -13,6 +13,28 @@ body {
 	width: 100%;
 	padding-top: 10%;
 }
+#scores {
+	width: 90%;
+	position: absolute;
+	top: 3.2em;
+	margin: 0 5%;
+	font-size: 3em;
+	text-align: center;
+}
+#scores .score {
+	width: 30%;
+	display: inline-block;
+}
+#categories {
+	font-size: 2em;
+	display: table;
+	width: 100%;
+}
+#categories .category {
+	width: 25%;
+	display: inline-block;
+	text-align: center;
+}
 #board {
 	/*display: flex;
 	flex-flow: row wrap;
@@ -96,6 +118,18 @@ body {
 	-moz-user-select: none;
 	-ms-user-select: none;
 	user-select: none;
+}
+#board table tr:first-child td {
+	border-top-width: 0;
+}
+#board table tr:last-child td {
+	border-bottom-width: 0;
+}
+.square:first-child {
+	border-left-width: 0;
+}
+.square:last-child {
+	border-right-width: 0;
 }
 .square.question-answered {
 	visibility: hidden;

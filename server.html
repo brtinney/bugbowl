@@ -11,6 +11,11 @@
     </head>
     <body>
         <h3>BUGBOWL</h3>
+        <div id="scores">
+            <span class="score"></span>
+            <span class="score"></span>
+            <span class="score"></span>
+        </div>
         <div id="board">
             <div id="static-sections">
                 <div id="splash">
@@ -49,30 +54,36 @@
                     <span id="question-wrong">&#10062;</span>
                 </div>
             </div>
+            <div id="categories">
+                <span class="category"></span>
+                <span class="category"></span>
+                <span class="category"></span>
+                <span class="category"></span>
+            </div>
             <table>
-                <tr data-value="100">
-                    <td id="square-0" class="square">0</td>
-                    <td id="square-1" class="square">1</td>
-                    <td id="square-2" class="square">2</td>
-                    <td id="square-3" class="square">3</td>
+                <tr data-value="100" data-index="0">
+                    <td id="square-0" data-index="0" class="square">0</td>
+                    <td id="square-1" data-index="1" class="square">1</td>
+                    <td id="square-2" data-index="2" class="square">2</td>
+                    <td id="square-3" data-index="3" class="square">3</td>
                 </tr>
-                <tr data-value="200">
-                    <td id="square-4" class="square">4</td>
-                    <td id="square-5" class="square">5</td>
-                    <td id="square-6" class="square">6</td>
-                    <td id="square-7" class="square">7</td>
+                <tr data-value="200" data-index="1">
+                    <td id="square-4" data-index="0" class="square">4</td>
+                    <td id="square-5" data-index="1" class="square">5</td>
+                    <td id="square-6" data-index="2" class="square">6</td>
+                    <td id="square-7" data-index="3" class="square">7</td>
                 </tr>
-                <tr data-value="300">
-                    <td id="square-8" class="square">8</td>
-                    <td id="square-9" class="square">9</td>
-                    <td id="square-10" class="square">10</td>
-                    <td id="square-11" class="square">11</td>
+                <tr data-value="300" data-index="2">
+                    <td id="square-8" data-index="0" class="square">8</td>
+                    <td id="square-9" data-index="1" class="square">9</td>
+                    <td id="square-10" data-index="2" class="square">10</td>
+                    <td id="square-11" data-index="3" class="square">11</td>
                 </tr>
-                <tr data-value="500">
-                    <td id="square-12" class="square">12</td>
-                    <td id="square-13" class="square">13</td>
-                    <td id="square-14" class="square">14</td>
-                    <td id="square-15" class="square">15</td>
+                <tr data-value="500" data-index="3">
+                    <td id="square-12" data-index="0" class="square">12</td>
+                    <td id="square-13" data-index="1" class="square">13</td>
+                    <td id="square-14" data-index="2" class="square">14</td>
+                    <td id="square-15" data-index="3" class="square">15</td>
                 </tr>
             </table>
             <div id="controls">
