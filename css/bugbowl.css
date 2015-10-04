@@ -1,8 +1,15 @@
 * {
 	box-sizing: border-box;
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
 }
 html {
 	height: 100%;
+	overflow: hidden;
 }
 body {
 	background: #000;
@@ -14,16 +21,24 @@ body {
 	padding-top: 10%;
 }
 #scores {
-	width: 90%;
-	position: absolute;
-	top: 3.2em;
-	margin: 0 5%;
-	font-size: 3em;
-	text-align: center;
+	width: 100%;
+	position: fixed;
+	top: 6%;
+	height:4%;
+	display:none;
 }
 #scores .score {
-	width: 30%;
+	text-align: center;
 	display: inline-block;
+	height: 100%;
+	cursor:pointer;
+	transition: background 350ms, color 350ms, font-weight 350ms, visibility 350ms ;
+}
+#scores .score:hover,  #scores .score.active {
+	background:#fff;
+	font-weight: bold;
+	color:#000;
+	transition: background 350ms, color 350ms, font-weight 350ms ;
 }
 #categories {
 	font-size: 2em;
@@ -135,16 +150,24 @@ body {
 	visibility: hidden;
 }
 h3 {
-	margin: -2em auto 1em;
-	font-size: 6em;
+	display:block;
+	position:fixed;
+	top:0;
+	height:6%;
+	width:100%;
+	margin:0;
+	padding:0;
 	text-align: center;
 	font-weight: bold;
 	font-family: "Century Gothic", sans-serif;
+	text-shadow: 2px 4px 3px rgba(0,0,0,0.3);
 }
 #controls {
-	position: absolute;
+	position: fixed;
 	bottom: 0;
+	left:0;
 	width: 100%;
+	padding: 0;
 }
 #next-section {
 	position: absolute;
@@ -162,4 +185,54 @@ h3 {
 	font-weight: bold;
 	font-size: 3em;
 	cursor: pointer;
+}
+
+#questionShell {
+	position:fixed;
+	top:10%;
+	width:100%;
+	text-align:center;
+	z-index: 101;
+	width:100%;
+	height:80%;
+	background:darkblue;
+	display:none;
+	box-shadow: inset 0 0 100px rgba(0,0,0,0.8);
+}
+#questionDisplay {
+	position: absolute;
+	top:10%;
+	left:10%;
+	height:80%;
+	width:80%;
+	text-shadow: 2px 4px 3px rgba(0,0,0,0.6);
+}
+#rebus {
+	display:block;
+	position:absolute;
+	top:10%;
+	height:80%;
+	width:100%;
+	z-index: 100;
+	background-size:100% 100%;
+	background-repeat: no-repeat;
+	display: none;
+}
+.rebusBlock {
+	display:inline-block;
+	text-align: center;
+	background:#000;
+	color:#FFF;
+	cursor: pointer;
+	padding:20px;
+}
+#rebus.admin .rebusBlock:hover {
+	background:#555;
+}
+.rebusBlock.clear {
+	visibility: hidden;
+}
+#solution {
+	color:#FFF;
+	text-align:center;
 }

@@ -10,12 +10,16 @@
         <link rel="stylesheet" href="css/bugbowl.css" type="text/css">
     </head>
     <body>
-        <h3>BUGBOWL</h3>
-        <div id="scores">
-            <span class="score"></span>
-            <span class="score"></span>
-            <span class="score"></span>
+        <h3 class="autosize"><span>BUGBOWL</span></h3>
+
+        <div id="questionShell">
+          <div id="questionDisplay" class="autosize"></div>
+          <div id="answerDisplay" class="autosize"></div>
         </div>
+        <div id="rebus" class="admin"></div>
+
+
+        <div id="scores"></div>
         <div id="board">
             <div id="static-sections">
                 <div id="splash">
@@ -87,12 +91,23 @@
                 </tr>
             </table>
             <div id="controls">
-                <span id="reset-game">Reset</span>
-                <span id="next-section">&raquo;</span>
+              <div id="solution">Solution here</div>
+              <!--
+              <span id="reset-game">Reset</span>
+              <span id="next-section">&raquo;</span>
+            -->
+              <button id="clearRebus">Clear Rebus</button>
+              <button id="correct">YES</button>
+              <button id="incorrect">X</button>
+              <select id="rounds"></select>
+
             </div>
         </div>
         <script src="js/jquery-2.1.4.min.js"></script>
+        <script src="js/jquery.textfill.min.js"></script>
         <script src="assets/questions.js"></script>
         <script src="js/bugbowl.js"></script>
+        <script src="js/server.js"></script>
+        <script src="js/common.js"></script>
     </body>
 </html>

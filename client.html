@@ -10,12 +10,16 @@
         <link rel="stylesheet" href="css/bugbowl.css" type="text/css">
     </head>
     <body>
-        <h3>BUGBOWL</h3>
-        <div id="scores">
-            <span class="score"></span>
-            <span class="score"></span>
-            <span class="score"></span>
+        <h3 class="autosize"><span>BUGBOWL</span></h3>
+        <div id="scores"></div>
+
+        <div id="questionShell">
+          <div id="questionDisplay" class="autosize"></div>
+          <div id="answerDisplay" class="autosize"></div>
         </div>
+
+        <div id="rebus"></div>
+
         <div id="board">
             <div id="static-sections">
                 <div id="splash">
@@ -46,16 +50,19 @@
                     Super hard problem that takes time here
                 </div>
             </div>
+
             <div id="question-view">
                 <div id="question-text"></div>
                 <div id="team-indicator"></div>
             </div>
+
             <div id="categories">
                 <span class="category"></span>
                 <span class="category"></span>
                 <span class="category"></span>
                 <span class="category"></span>
             </div>
+
             <table>
                 <tr data-value="100" data-index="0">
                     <td id="square-0" data-index="0" class="square">0</td>
@@ -82,54 +89,11 @@
                     <td id="square-15" data-index="3" class="square">15</td>
                 </tr>
             </table>
-            <div id="controls">
-                <span id="reset-game">Reset</span>
-                <span id="next-section">&raquo;</span>
-            </div>
         </div>
         <script src="js/jquery-2.1.4.min.js"></script>
+        <script src="js/jquery.textfill.min.js"></script>
         <script src="assets/questions.js"></script>
-        <script src="js/bugbowl.js"></script>
-        <script>
-            server = 0;
-            var loop = setInterval(
-                function()
-                {
-                    var event = JSON.parse(localStorage.bugbowl_event);
-                    if(event.length <= 0) { return; }
-                    event = event.shift();
-                    localStorage.bugbowl_event = JSON.stringify(JSON.parse(localStorage.bugbowl_event).slice(1));
-
-                    if(event.type == "square")
-                    {
-                        $('#'+event.id).trigger('click');
-                    }
-                    else if(event.type == "bugbowl-team")
-                    {
-                        $(window).trigger('bugbowl.team', event.team);
-                    }
-                    else if(event.type == "question-correct")
-                    {
-                        $('#question-correct').trigger('click');
-                    }
-                    else if(event.type == "question-wrong")
-                    {
-                        $('#question-wrong').trigger('click');
-                    }
-                    else if(event.type == "next-section")
-                    {
-                        $('#next-section').trigger('click');
-                    }
-                    else if(event.type == "reset-game")
-                    {
-                        // Sometimes the loop is faster, so just make sure
-                        localStorage.bugbowl_event = JSON.parse(localStorage.bugbowl_event).push('reset-game');
-                        clearTimeout(loop);
-                        location.reload();
-                    }
-                },
-                20
-            );
-        </script>
+        <script src="js/common.js"></script>
+        <script src="js/client.js"></script>
     </body>
 </html>
