@@ -1,10 +1,5 @@
 $(function(){
 
-  // Sanity check configuration file
-  if (!localStorage.getItem) alert("ERROR: LocalStorage unavailable")
-  if (CONFIG.teams.length < 2) alert("ERROR: Too few teams defined in config");
-  if (CONFIG.pointValues.length < 2) alert("ERROR: Too few jeopardy point values defined in config");
-
   // Add team score holders
   $.each(CONFIG.teams, function(i,v){ $('<div/>', {
       id: "score-"+i,
@@ -63,6 +58,8 @@ function showScores(visible){
 
 function buildRebus(game){
   $("#rebus").empty();
+
+
   for (var i = 0; i < CONFIG.rebusRow * CONFIG.rebusColumn; i++) {
     $('<div/>', {
         id: "rebus-"+i,
@@ -86,6 +83,37 @@ function clearRebusBlock(block) {
   $("#rebus .rebusBlock").eq(block).addClass('clear');
 }
 
+function buildJeopardy(game){
+  $("#jeopardy").empty();
+  $("#rebus").hide();
+
+  $.each(game.board, function(i,v){
+    // Create the container for the category
+    var containerName = "jeopardyColumn-"+i;
+    $('<div/>', {
+        id: containerName,
+        "class": "jeopardyColumn",
+        style: "width:"+(100/game.board.length)+"%;height:100%"
+      }).appendTo("#jeopardy")
+
+    $('<div/>', {
+          "class": "jeopardyHeader autosize",
+          style: "width:100%;height:"+(100/(v.questions.length+1))+"%",
+          html: "<span>"+v.category+"</span>"
+        }).appendTo("#"+containerName)
+
+    for (var idx = 0; idx < v.questions.length; ++idx)
+      $('<div/>', {
+            "class": "jeopardyOption autosize",
+            style: "width:100%;height:"+(100/(v.questions.length+1))+"%",
+            html: game.pointValues[idx]
+          }).appendTo("#"+containerName)
+  })
+
+  $("#jeopardy, #correct, #incorrect, #solution").show()
+}
+
+
 // Handle dynamic size elements
 function sizeStaticElements(){
   //$("#questionDisplay").css('padding', $("#questionDisplay").width() * CONFIG.questionPadding)
@@ -94,7 +122,7 @@ function sizeStaticElements(){
 
 
 function showIntermission(game) {
-  $("#rebus, #scores, #answer").fadeOut(CONFIG.transitionDuration)
+  $("#rebus, #scores, #answer, #jeopardy").fadeOut(CONFIG.transitionDuration)
 }
 
 

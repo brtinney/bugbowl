@@ -4,12 +4,45 @@
 //}
 
 // State variables
-ACTIVE_TEAM = null; // 1 indexed
-ROUND = 0;
-POINTS = null;
-ACTIVE_CELL = null;
 
-CAN_SCORE = false;
+var GameState = (function() {
+  var _ROUND;
+  var _TEAM;
+  var _POINTS;
+  var _BOARD;
+
+  function GameState() {
+
+    // Load previous game state from localstorage
+    if (confirm("Do you want to use existing game state?")) {
+      _POINTS = JSON.parse(localStorage.points);
+      _TEAM = JSON.parse(localStorage.team);
+      _ROUND = JSON.parse(localStorage.round);
+      _BOARD = JSON.parse(localStorage.board);
+    // Make a fresh game state
+    } else {
+      _POINTS = Array.apply(null, Array(CONFIG.teams.length)).map(Number.prototype.valueOf,0);
+      _TEAM = 0
+      _ROUND = 0
+      _BOARD = {}
+      localStorage.points = JSON.stringify(_POINTS);
+      localStorage.team = JSON.stringify(_TEAM);
+      localStorage.round = JSON.stringify(_ROUND);
+      localStorage.board = JSON.stringify(_BOARD);
+    }
+  };
+
+  GameState.prototype.getTeam = function() { return _TEAM; };
+  GameState.prototype.getRound = function() { return _ROUND; };
+  GameState.prototype.getPoints = function() { return _POINTS; };
+  GameState.prototype.getBoard = function() { return _BOARD; };
+
+  GameState.prototype.setTeam = function(team) { _TEAM = team; localStorage.team = JSON.stringify(_TEAM); };
+  GameState.prototype.setRound = function(round) { _ROUND = round; localStorage.round = JSON.stringify(_ROUND); };
+  GameState.prototype.setPoints = function(points) { _POINTS = points; localStorage.points = JSON.stringify(_POINTS); };
+
+  return GameState;
+})();
 
 // Identifies a previously existing client window
 function getWinName(url){
@@ -23,9 +56,16 @@ function sendCommand(cmd, data) {
 }
 
 function runGame(game) {
+
   if (game.type == 'rebus') {
     sendCommand('showScores', true);
     sendCommand('buildRebus', game);
+    sendCommand('sizeStaticElements');
+  }
+
+  else if (game.type == 'jeopardy') {
+    sendCommand('showScores', true);
+    sendCommand('buildJeopardy', game);
     sendCommand('sizeStaticElements');
   }
 
@@ -46,20 +86,26 @@ function runGame(game) {
 // Reference to the client window
 var clientScreen = window.open("client.html", getWinName("client.html"), "toolbar=0,location=0,menubar=0")
 if (!clientScreen) alert("ERROR: Pop-up blocker seems to be enabled. Please allow popups for the client")
+var gameState;
 
 function initialize() {
   localStorage.scores = JSON.stringify(Array.apply(null, Array(CONFIG.teams.length)).map(Number.prototype.valueOf,0));
+
+  gameState = new GameState();
+
   $.each(GAMES, function(i,v){ $('<option/>', {
       value: i,
       html: v.name
     }).appendTo("#rounds")
   })
+
+  $("#rounds option").eq(gameState.getBoard()).prop('selected', 'selected')
 }
 
 // Allow client to initialize
 setTimeout(function(){
   sendCommand('initialize');
-  runGame(GAMES[ROUND]);
+  runGame(GAMES[gameState.getRound()]);
 
 }, 150);
 
@@ -76,7 +122,7 @@ function updatePoints(team, points) {
 
 function correct(){
   //if (!CAN_SCORE) alert('score fault'); return;
-  var game = GAMES[ROUND];
+  var game = GAMES[gameState.getRound()];
   sendCommand('hideQuestion')
 
   if (game.type == "rebus") {
@@ -87,7 +133,7 @@ function correct(){
 
 function incorrect(){
   //if (!CAN_SCORE) alert('score fault'); return;
-  var game = GAMES[ROUND];
+  var game = GAMES[gameState.getRound()];
   sendCommand('hideQuestion')
 
   if (game.type == "rebus") {
@@ -140,6 +186,6 @@ $("#rebus").on("click", '.rebusBlock', function(e){
 });
 
 $("#rounds").on("change", function(e){
-  console.log($(this).val())
+  gameState.setRound($(this).val());
   runGame(GAMES[$(this).val()])
 });

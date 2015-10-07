@@ -34,7 +34,7 @@ body {
 	cursor:pointer;
 	transition: background 350ms, color 350ms, font-weight 350ms, visibility 350ms ;
 }
-#scores .score:hover,  #scores .score.active {
+#scores.admin .score:hover,  #scores .score.active {
 	background:#fff;
 	font-weight: bold;
 	color:#000;
@@ -235,4 +235,17 @@ h3 {
 #solution {
 	color:#FFF;
 	text-align:center;
+}
+#jeopardy {
+	display:block;
+	position:absolute;
+	top:10%;
+	height:80%;
+	width:100%;
+	text-align: center;
+}
+.jeopardyColumn {
+	display: inline-block;
+}
+.jeopardyCategory {
 }

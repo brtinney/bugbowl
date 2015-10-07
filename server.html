@@ -16,80 +16,11 @@
           <div id="questionDisplay" class="autosize"></div>
           <div id="answerDisplay" class="autosize"></div>
         </div>
+
         <div id="rebus" class="admin"></div>
+        <div id="scores" class="admin"></div>
+        <div id="jeopardy" class="admin"></div>
 
-
-        <div id="scores"></div>
-        <div id="board">
-            <div id="static-sections">
-                <div id="splash">
-                    <embed src="assets/intro.swf">
-                </div>
-                <div id="intro">
-                    <embed src="assets/bugbots.swf">
-                </div>
-                <div id="rebus_rules">
-                    <img src="assets/sample.png">
-                </div>
-                <div id="audience">
-                    Hey audience, it's your turn!
-                </div>
-                <div id="transition">
-                    <embed src="assets/addicted_2bugs.swf">
-                </div>
-                <div id="point_rules">
-                    Some rules about the point stuff
-                </div>
-                <div id="final_transition">
-                    <embed src="assets/cant_touch_this.swf">
-                </div>
-                <div id="final_rules">
-                    These are the final rules
-                </div>
-                <div id="final">
-                    Super hard problem that takes time here
-                </div>
-            </div>
-            <div id="question-view">
-                <div id="question-text"></div>
-                <div id="question-answer"></div>
-                <div id="question-interaction">
-                    <span id="question-correct">&#9989;</span>
-                    <span id="question-wrong">&#10062;</span>
-                </div>
-            </div>
-            <div id="categories">
-                <span class="category"></span>
-                <span class="category"></span>
-                <span class="category"></span>
-                <span class="category"></span>
-            </div>
-            <table>
-                <tr data-value="100" data-index="0">
-                    <td id="square-0" data-index="0" class="square">0</td>
-                    <td id="square-1" data-index="1" class="square">1</td>
-                    <td id="square-2" data-index="2" class="square">2</td>
-                    <td id="square-3" data-index="3" class="square">3</td>
-                </tr>
-                <tr data-value="200" data-index="1">
-                    <td id="square-4" data-index="0" class="square">4</td>
-                    <td id="square-5" data-index="1" class="square">5</td>
-                    <td id="square-6" data-index="2" class="square">6</td>
-                    <td id="square-7" data-index="3" class="square">7</td>
-                </tr>
-                <tr data-value="300" data-index="2">
-                    <td id="square-8" data-index="0" class="square">8</td>
-                    <td id="square-9" data-index="1" class="square">9</td>
-                    <td id="square-10" data-index="2" class="square">10</td>
-                    <td id="square-11" data-index="3" class="square">11</td>
-                </tr>
-                <tr data-value="500" data-index="3">
-                    <td id="square-12" data-index="0" class="square">12</td>
-                    <td id="square-13" data-index="1" class="square">13</td>
-                    <td id="square-14" data-index="2" class="square">14</td>
-                    <td id="square-15" data-index="3" class="square">15</td>
-                </tr>
-            </table>
             <div id="controls">
               <div id="solution">Solution here</div>
               <!--
@@ -106,6 +37,7 @@
         <script src="js/jquery-2.1.4.min.js"></script>
         <script src="js/jquery.textfill.min.js"></script>
         <script src="assets/questions.js"></script>
+        <script src="js/validation.js"></script>
         <script src="js/bugbowl.js"></script>
         <script src="js/server.js"></script>
         <script src="js/common.js"></script>
