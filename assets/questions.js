@@ -28,12 +28,13 @@ var GAMES = [
 		name: 'Rebus 1',
 		type: 'rebus',
 		image: 'assets/rebus-1.jpg',
-		solution: 'this is the answer',
+		solution: 'Rebus Answer',
 		questions: [
 			{q: 'this is a question', a: 'answer1'},
 			{q: 'this is another question', a: 'answer2'}
 		],
-		points: 100
+		points: 100,
+		boardClearPoints: 500
 	},
 	{
 		name: 'Video 1',
@@ -41,19 +42,49 @@ var GAMES = [
 		source: 'assets/video1.swf'
 	},
 	{
-		name: 'Jeopardy 1',
-		type: 'jeopardy',
-		pointValues: [100, 200, 300, 400, 500],
+		name: 'Categories 1',
+		type: 'categories',
+		pointValues: [100, 200, 300, 500],
 		board: [
-			{category: 'Topic 1'},
-			{category: 'Topic 2'}
+			{ category: 'Topic 1',
+				questions: [
+					{q: 'this is a question', a: 'answer1'},
+					{q: 'this is another question', a: 'answer2'},
+					{q: 'this is a question', a: 'answer1'},
+					{q: 'this is another question', a: 'answer2'}
+				]
+			},
+			{ category: 'Topic 2',
+				questions: [
+					{q: 'this is a question', a: 'answer1'},
+					{q: 'this is another question', a: 'answer2'},
+					{q: 'this is a question', a: 'answer1'},
+					{q: 'this is another question', a: 'answer2'}
+				]
+			},
+			{ category: 'Topic 3',
+				questions: [
+					{q: 'this is a question', a: 'answer1'},
+					{q: 'this is another question', a: 'answer2'},
+					{q: 'this is a question', a: 'answer1'},
+					{q: 'this is another question', a: 'answer2'}
+				]
+			},
+			{ category: 'Topic 4',
+				questions: [
+					{q: 'this is a question', a: 'answer1'},
+					{q: 'this is another question', a: 'answer2'},
+					{q: 'this is a question', a: 'answer1'},
+					{q: 'this is another question', a: 'answer2'}
+				]
+			}
 		]
 	}
 ];
 
 var CONFIG = {
-	teams: ['team1', 'team2', 'team3', 'team4'],
-	pointValues: [100, 200, 300, 400, 500],
+	teams: ['team1', 'team2', 'team3'],
+	pointValues: [100, 200, 300, 500],
 	transitionDuration: 200,
 	rebusRow: 4,
 	rebusColumn: 4

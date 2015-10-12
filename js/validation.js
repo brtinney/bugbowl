@@ -33,7 +33,7 @@ $(function(){
 
   }
 
-  function validateJeopardy(game){
+  function validateCategories(game){
 
   }
 
@@ -48,7 +48,7 @@ $(function(){
   for (var i = 0; i < GAMES.length; ++i) {
     if (GAMES[i].type == "rebus") validateRebus(GAMES[i]);
     else if (GAMES[i].type == "intermission") validateIntermission(GAMES[i]);
-    else if (GAMES[i].type == "jeopardy") validateJeopardy(GAMES[i]);
+    else if (GAMES[i].type == "categories") validateCategories(GAMES[i]);
     else errors.push('Unknown game type defined: ' + GAMES[i].type);
   }
 

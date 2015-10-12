@@ -63,9 +63,9 @@ function runGame(game) {
     sendCommand('sizeStaticElements');
   }
 
-  else if (game.type == 'jeopardy') {
+  else if (game.type == 'categories') {
     sendCommand('showScores', true);
-    sendCommand('buildJeopardy', game);
+    sendCommand('buildCategories', game);
     sendCommand('sizeStaticElements');
   }
 
@@ -87,6 +87,7 @@ function runGame(game) {
 var clientScreen = window.open("client.html", getWinName("client.html"), "toolbar=0,location=0,menubar=0")
 if (!clientScreen) alert("ERROR: Pop-up blocker seems to be enabled. Please allow popups for the client")
 var gameState;
+var INDEX_COUNTER = 0;
 
 function initialize() {
   localStorage.scores = JSON.stringify(Array.apply(null, Array(CONFIG.teams.length)).map(Number.prototype.valueOf,0));
@@ -99,7 +100,8 @@ function initialize() {
     }).appendTo("#rounds")
   })
 
-  $("#rounds option").eq(gameState.getBoard()).prop('selected', 'selected')
+  $("#rounds option").eq(gameState.getBoard()).prop('selected', 'selected');
+  sendCommand('highlightTeam', gameState.getTeam());
 }
 
 // Allow client to initialize
@@ -117,7 +119,7 @@ function updatePoints(team, points) {
   var scores = JSON.parse(localStorage.scores);
   scores[team] += points;
   localStorage.scores = JSON.stringify(scores);
-  sendCommand('updateScores', scores)
+  sendCommand('updateScores', scores);
 }
 
 function correct(){
@@ -127,65 +129,144 @@ function correct(){
 
   if (game.type == "rebus") {
     sendCommand('clearRebusBlock', ACTIVE_CELL);
-    updatePoints(ACTIVE_TEAM, game.points);
+    updatePoints(gameState.getTeam(), game.points);
+    //nextTeam();
+  }
+  else if (game.type == "categories") {
+    sendCommand('clearCategoriesBlock', [ACTIVE_CELL.data('column'), ACTIVE_CELL.data('row')]);
+    updatePoints(gameState.getTeam(), ACTIVE_CELL.data('points'));
   }
 }
 
 function incorrect(){
   //if (!CAN_SCORE) alert('score fault'); return;
   var game = GAMES[gameState.getRound()];
-  sendCommand('hideQuestion')
 
   if (game.type == "rebus") {
-    sendCommand('rebusIncorrect')
-    updatePoints(ACTIVE_TEAM, -game.points);
+    sendCommand('hideQuestion');
+    nextTeam();
+  }
+  else if (game.type == "categories") {
+    sendCommand('categoriesIncorrect');
+    updatePoints(gameState.getTeam(), -ACTIVE_CELL.data('points'));
   }
 
 }
 
-// Rebus Solved
-$("#clearRebus").on("click", function(e){
-    sendCommand('clearRebus');
-    updatePoints(ACTIVE_TEAM, POINTS)
-});
+function losingTeam() {
+  var scores = JSON.parse(localStorage.scores);
+  var min = Infinity;
+  var losing = 0;
 
-$(window).keydown(function(e) {
-
-  // Team Selection (via keyboard)
-  var team = e.keyCode - 49; // Offset ASCII, '1' = 0, '2' = 1
-  if (team >= 0 && team < CONFIG.teams.length) {
-    ACTIVE_TEAM = team;
-    sendCommand('highlightTeam', ACTIVE_TEAM)
+  for(var i in scores) {
+    if(scores[i] < min) {
+      losing = i;
+      min = scores[i];
+    }
   }
 
-  // Incorrect answer (Escape)
-  if (e.keyCode == 27) {
-    incorrect();
+  return losing;
+}
+
+function nextTeam() {
+  var team = gameState.getTeam();
+  if(team+1 == CONFIG.teams.length) {
+    team = 0;
+  }
+  else {
+    team += 1;
   }
 
-  if (e.keyCode == 13) {
-    correct();
-  }
-});
+  gameState.setTeam(team);
+  sendCommand('highlightTeam', gameState.getTeam());
+}
 
-// Team Selection (via mouse)
-$("#scores").on("click", ".score", function(e){
-  ACTIVE_TEAM = $(this).data('team')
-  sendCommand('highlightTeam', ACTIVE_TEAM)
-});
+function renderAnswer(answer) {
+  $("#answerDisplay").html("<span>"+answer+"</span>")
+    .textfill({maxFontPixels:0});
+}
 
-//$("#correct").on("click", function(e){ sendCommand('clearRebusBlock', ACTIVE_CELL); });
-//$("#incorrect").on("click", function(e){ sendCommand('rebusIncorrect'); });
-$("#correct").on("click", correct);
-$("#incorrect").on("click", incorrect);
+$(function() {
 
-$("#rebus").on("click", '.rebusBlock', function(e){
-  ACTIVE_CELL = $(this).data('block');
-  sendCommand('renderQuestion', "This is a nice long question to which we would like the answer.  How about a few more characters?");
-  //sendCommand('clearRebusBlock', ACTIVE_CELL);
-});
+    // Rebus Solved
+    $("#clearRebus").on("click", function(e){
+        var game = GAMES[gameState.getRound()];
+        sendCommand('clearRebus');
+        updatePoints(gameState.getTeam(), game.boardClearPoints)
+    });
 
-$("#rounds").on("change", function(e){
-  gameState.setRound($(this).val());
-  runGame(GAMES[$(this).val()])
+    $('#clearQuestion').on('click', function(e) {
+      sendCommand('hideQuestion');
+      sendCommand('clearCategoriesBlock', [ACTIVE_CELL.data('column'), ACTIVE_CELL.data('row')]);
+    });
+
+    $(window).keydown(function(e) {
+
+      // Team Selection (via keyboard)
+      var team = e.keyCode - 49; // Offset ASCII, '1' = 0, '2' = 1
+      if (team >= 0 && team < CONFIG.teams.length) {
+        gameState.setTeam(team);
+        sendCommand('highlightTeam', gameState.getTeam());
+      }
+
+      if (e.keyCode == 78) { // n
+        nextTeam();
+      }
+
+      // Incorrect answer (Escape)
+      if (e.keyCode == 27) {
+        incorrect();
+      }
+
+      if (e.keyCode == 13) {
+        correct();
+      }
+    });
+
+    // Team Selection (via mouse)
+    $("#scores").on("click", ".score", function(e){
+      gameState.setTeam($(this).data('team'));
+      sendCommand('highlightTeam', gameState.getTeam());
+    });
+
+    //$("#correct").on("click", function(e){ sendCommand('clearRebusBlock', ACTIVE_CELL); });
+    //$("#incorrect").on("click", function(e){ sendCommand('rebusIncorrect'); });
+    $("#correct").on("click", correct);
+    $("#incorrect").on("click", incorrect);
+
+    $("#rebus").on("click", '.rebusBlock', function(e){
+      ACTIVE_CELL = $(this).data('block');
+      sendCommand('renderQuestion', "This is a nice long question to which we would like the answer.  How about a few more characters?");
+      renderAnswer('This is the answer');
+      //sendCommand('clearRebusBlock', ACTIVE_CELL);
+    });
+
+    $("#categories").on("click", '.categoriesOption', function(e) {
+      var game = GAMES[gameState.getRound()];
+      if (INDEX_COUNTER == game.doublePoints) {
+        sendCommand('doublePoints', true);
+      }
+      INDEX_COUNTER += 1;
+      ACTIVE_CELL = $(this);
+      sendCommand('renderQuestion', "This is a nice long question to which we would like the answer.  How about a few more characters?");
+      renderAnswer('This is the answer');
+      //sendCommand('clearRebusBlock', ACTIVE_CELL);
+    });
+
+    $('#doublePoints').on('click', function(e) {
+      sendCommand('doublePoints', false);
+    });
+
+    $("#rounds").on("change", function(e){
+      gameState.setRound(parseInt($(this).val()));
+      runGame(GAMES[parseInt($(this).val())]);
+      INDEX_COUNTER = 0;
+      gameState.setTeam(losingTeam());
+      sendCommand('highlightTeam', gameState.getTeam());
+    });
+
+    $('#next-round').on("click", function(e) {
+      var round = gameState.getRound();
+      $('#rounds').val(round+1).trigger('change');
+    });
 });

@@ -58,7 +58,7 @@ function showScores(visible){
 
 function buildRebus(game){
   $("#rebus").empty();
-
+  $('clearQuestion').hide();
 
   for (var i = 0; i < CONFIG.rebusRow * CONFIG.rebusColumn; i++) {
     $('<div/>', {
@@ -83,36 +83,53 @@ function clearRebusBlock(block) {
   $("#rebus .rebusBlock").eq(block).addClass('clear');
 }
 
-function buildJeopardy(game){
-  $("#jeopardy").empty();
+function buildCategories(game){
+  $("#categories").empty();
   $("#rebus").hide();
+  $('#clearRebus').hide();
+  $('#clearQuestion').show();
+
+  game.doublePoints = Math.floor(Math.random() * (game.board.length * game.pointValues.length));
 
   $.each(game.board, function(i,v){
     // Create the container for the category
-    var containerName = "jeopardyColumn-"+i;
+    var containerName = "categoriesColumn-"+i;
     $('<div/>', {
         id: containerName,
-        "class": "jeopardyColumn",
+        "class": "categoriesColumn",
         style: "width:"+(100/game.board.length)+"%;height:100%"
-      }).appendTo("#jeopardy")
+      }).appendTo("#categories")
 
     $('<div/>', {
-          "class": "jeopardyHeader autosize",
+          "class": "categoriesHeader autosize",
           style: "width:100%;height:"+(100/(v.questions.length+1))+"%",
           html: "<span>"+v.category+"</span>"
         }).appendTo("#"+containerName)
 
     for (var idx = 0; idx < v.questions.length; ++idx)
       $('<div/>', {
-            "class": "jeopardyOption autosize",
+            "class": "categoriesOption autosize",
+            "data-column": i,
+            "data-row": idx,
+            "data-points": game.pointValues[idx],
             style: "width:100%;height:"+(100/(v.questions.length+1))+"%",
-            html: game.pointValues[idx]
+            html: "<span>"+game.pointValues[idx]+"</span>"
           }).appendTo("#"+containerName)
   })
 
-  $("#jeopardy, #correct, #incorrect, #solution").show()
+  $("#categories, #correct, #incorrect, #solution").show()
 }
 
+function clearCategoriesBlock(arr) {
+  $("#categoriesColumn-"+arr[0]+" .categoriesOption").eq(arr[1]).addClass('clear');
+}
+
+function doublePoints(show) {
+  if(show)
+    $('#doublePoints').show().textfill({maxFontPixels:0});
+  else
+    $('#doublePoints').hide();
+}
 
 // Handle dynamic size elements
 function sizeStaticElements(){
@@ -122,7 +139,7 @@ function sizeStaticElements(){
 
 
 function showIntermission(game) {
-  $("#rebus, #scores, #answer, #jeopardy").fadeOut(CONFIG.transitionDuration)
+  $("#rebus, #scores, #answer, #categories").fadeOut(CONFIG.transitionDuration)
 }
 
 
@@ -132,5 +149,3 @@ $(window).resize(function(){
 });
 
 $(sizeStaticElements);
-
-// TODO: implement team selection via number keys

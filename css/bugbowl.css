@@ -199,6 +199,19 @@ h3 {
 	display:none;
 	box-shadow: inset 0 0 100px rgba(0,0,0,0.8);
 }
+#doublePoints {
+	position:fixed;
+	top:10%;
+	width:100%;
+	text-align:center;
+	z-index: 102;
+	width:100%;
+	height:80%;
+	background:darkorange;
+	cursor: pointer;
+	display:none;
+	box-shadow: inset 0 0 100px rgba(0,0,0,0.8);
+}
 #questionDisplay {
 	position: absolute;
 	top:10%;
@@ -206,6 +219,25 @@ h3 {
 	height:80%;
 	width:80%;
 	text-shadow: 2px 4px 3px rgba(0,0,0,0.6);
+}
+.admin #questionDisplay {
+	position: absolute;
+	top:5%;
+	left:5%;
+	height:50%;
+	width:90%;
+	text-shadow: 2px 4px 3px rgba(0,0,0,0.6);
+}
+.admin #answerDisplay {
+	position: absolute;
+	top:60%;
+	left:15%;
+	height:35%;
+	width:70%;
+	text-shadow: 2px 4px 3px rgba(0,0,0,0.6);
+	color: #FC0;
+	padding: 20px;
+	border-top: 3px solid #666;
 }
 #rebus {
 	display:block;
@@ -233,10 +265,11 @@ h3 {
 	visibility: hidden;
 }
 #solution {
-	color:#FFF;
-	text-align:center;
+	text-align: center;
+	font-size: 150%;
+	color: #FC0;
 }
-#jeopardy {
+#categories {
 	display:block;
 	position:absolute;
 	top:10%;
@@ -244,8 +277,32 @@ h3 {
 	width:100%;
 	text-align: center;
 }
-.jeopardyColumn {
+.categoriesColumn {
 	display: inline-block;
 }
-.jeopardyCategory {
+.categoriesHeader {
+	display:inline-block;
+	text-align: center;
+	background:#000;
+	color:#FFF;
+	cursor: pointer;
+	padding:20px;
+}
+.categoriesOption {
+	display:inline-block;
+	text-align: center;
+	background:#000;
+	color:#FFF;
+	cursor: pointer;
+	padding:20px;
+}
+#categories.admin .categoriesOption:hover {
+	background:#555;
+}
+.categoriesOption.clear {
+	visibility: hidden;
+}
+#next-round {
+	font-size: 180%;
+	cursor: pointer;
 }
