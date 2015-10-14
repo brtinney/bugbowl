@@ -106,7 +106,8 @@ function buildCategories(game){
     $('<div/>', {
           "class": "categoriesHeader autosize",
           style: "width:100%;height:"+(100/(v.questions.length+1))+"%",
-          html: "<span>"+v.category+"</span>"
+          html: "<span>"+v.category+"</span>",
+          "data-sizegroup": "categoriesHeader"
         }).appendTo("#"+containerName)
 
     for (var idx = 0; idx < v.questions.length; ++idx)
@@ -115,6 +116,7 @@ function buildCategories(game){
             "data-column": i,
             "data-row": idx,
             "data-points": game.pointValues[idx],
+            "data-sizegroup": "categoriesOption",
             style: "width:100%;height:"+(100/(v.questions.length+1))+"%",
             html: "<span>"+game.pointValues[idx]+"</span>"
           }).appendTo("#"+containerName)
@@ -138,7 +140,8 @@ function doublePoints(show) {
 // Handle dynamic size elements
 function sizeStaticElements(){
   //$("#questionDisplay").css('padding', $("#questionDisplay").width() * CONFIG.questionPadding)
-  $(".autosize").textfill({maxFontPixels:0});
+  //$(".autosize").textfill({maxFontPixels:0});
+  $(".autosize").dynasize();
 }
 
 
@@ -149,7 +152,7 @@ function showIntermission(game) {
 
 $(window).resize(function(){
   clearTimeout(rescaleTimeout);
-  rescaleTimeout = setTimeout(sizeStaticElements, 150);
+  rescaleTimeout = setTimeout(sizeStaticElements, 50);
 });
 
 $(sizeStaticElements);
