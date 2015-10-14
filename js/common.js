@@ -6,7 +6,7 @@ $(function(){
       "data-team": i,
       "class": "score autosize",
       style: "width:"+(100/CONFIG.teams.length)+"%",
-      html: "<span>0</span>"
+      html: '<div class="name">'+v+'</div><span class="value">0</span>'
     }).appendTo("#scores")
   })
 
@@ -27,17 +27,17 @@ function renderQuestion(text) {
     .textfill({maxFontPixels:0});
   $("#questionShell").hide()
     .fadeIn(CONFIG.transitionDuration);
-  CAN_SCORE = true;
 }
 
 function hideQuestion() {
-    $("#questionShell").fadeOut(CONFIG.transitionDuration);
-    //CAN_SCORE = false;
+  $("#questionShell").fadeOut(CONFIG.transitionDuration);
 }
 
-function highlightTeam(teamNumber){
+function highlightTeam(teamNumber) {
   $("#scores .score").removeClass("active");
-  $("#scores .score").eq(teamNumber).addClass("active")
+  if(teamNumber >= 0) {
+    $("#scores .score").eq(teamNumber).addClass("active");
+  }
 }
 
 function updateBoard(){
@@ -46,7 +46,7 @@ function updateBoard(){
 
 function updateScores(scores){
   $.each(CONFIG.teams, function(i,v){
-    $('#score-'+i+' span').text(scores[i]);
+    $('#score-'+i+' span.value').text(scores[i]);
   })
 }
 
@@ -56,9 +56,15 @@ function showScores(visible){
   updateScores(JSON.parse(localStorage.scores));
 }
 
+function showAudience(visible) {
+  if (visible) $("#audience").fadeIn(CONFIG.transitionDuration);
+  else $("#audience").fadeOut(CONFIG.transitionDuration);
+}
+
 function buildRebus(game){
   $("#rebus").empty();
   $('clearQuestion').hide();
+  showAudience(false);
 
   for (var i = 0; i < CONFIG.rebusRow * CONFIG.rebusColumn; i++) {
     $('<div/>', {
@@ -72,7 +78,7 @@ function buildRebus(game){
   $("#rebus").css('background-image', "url('"+game.image+"')");
   $("#rebus").fadeIn(1500);
   $("#solution").html(game.solution);
-  $("#correct, #incorrect, #solution").show()
+  $("#correct, #incorrect, #solution, #clearRebus").show()
 }
 
 function clearRebus(){
@@ -85,11 +91,8 @@ function clearRebusBlock(block) {
 
 function buildCategories(game){
   $("#categories").empty();
-  $("#rebus").hide();
-  $('#clearRebus').hide();
-  $('#clearQuestion').show();
-
-  game.doublePoints = Math.floor(Math.random() * (game.board.length * game.pointValues.length));
+  showAudience(false);
+  $('#rebus, #clearRebus, #solution').hide();
 
   $.each(game.board, function(i,v){
     // Create the container for the category
@@ -117,7 +120,8 @@ function buildCategories(game){
           }).appendTo("#"+containerName)
   })
 
-  $("#categories, #correct, #incorrect, #solution").show()
+  $("#correct, #incorrect, #clearQuestion").show();
+  $('#categories').css('display', 'table');
 }
 
 function clearCategoriesBlock(arr) {
@@ -139,7 +143,7 @@ function sizeStaticElements(){
 
 
 function showIntermission(game) {
-  $("#rebus, #scores, #answer, #categories").fadeOut(CONFIG.transitionDuration)
+  $("#rebus, #scores, #answer, #categories, #solution, #audience").fadeOut(CONFIG.transitionDuration)
 }
 
 

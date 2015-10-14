@@ -10,7 +10,9 @@
         <link rel="stylesheet" href="css/bugbowl.css" type="text/css">
     </head>
     <body>
-        <h3 class="autosize"><span>BUGBOWL</span></h3>
+        <div id="audience" class="autosize">
+          <span>Audience Participation</span>
+        </div>
 
         <div id="questionShell" class="admin">
           <div id="questionDisplay" class="autosize"></div>
@@ -24,15 +26,15 @@
         <div id="scores" class="admin"></div>
         <div id="categories" class="admin"></div>
 
-            <div id="controls">
-              <div id="solution">Solution here</div>
-              <button id="clearRebus">Clear Rebus</button>
-              <button id="clearQuestion" style="display: none;">Clear Question</button>
-              <button id="correct">YES</button>
-              <button id="incorrect">X</button>
-              <select id="rounds"></select>
-              <span id="next-round">&raquo;</span>
-            </div>
+        <div id="controls">
+          <div id="solution">Solution here</div>
+          <button id="clearRebus">Clear Rebus</button>
+          <button id="clearQuestion" style="display: none;">Clear Question</button>
+          <button id="correct">YES</button>
+          <button id="incorrect">X</button>
+          <select id="rounds"></select>
+          <span id="next-round">&raquo;</span>
+          <span id="wager"><input type="text" value="" placeholder="Enter team wager"><button>Set Wager</button></span>
         </div>
         <script src="js/jquery-2.1.4.min.js"></script>
         <script src="js/jquery.textfill.min.js"></script>

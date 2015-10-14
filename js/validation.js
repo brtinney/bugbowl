@@ -22,19 +22,27 @@ $(function(){
     }
   }
 
-  function validateRebus(game){
+  function validateRebus(game) {
     if (!game.image) errors.push(game.name + ' missing background image')
     if (!game.solution) errors.push(game.name + ' missing solution')
 
     //if (!imageExists(game.image)) errors.push(game.name + ' specified invalid image')
   }
 
-  function validateIntermission(game){
+  function validateIntermission(game) {
 
   }
 
-  function validateCategories(game){
+  function validateCategories(game) {
 
+  }
+
+  function validateFinalTrivia(game) {
+
+  }
+
+  function validateClosing(game) {
+    
   }
 
   // Check for environment requirements
@@ -49,6 +57,8 @@ $(function(){
     if (GAMES[i].type == "rebus") validateRebus(GAMES[i]);
     else if (GAMES[i].type == "intermission") validateIntermission(GAMES[i]);
     else if (GAMES[i].type == "categories") validateCategories(GAMES[i]);
+    else if (GAMES[i].type == "final_trivia") validateFinalTrivia(GAMES[i]);
+    else if (GAMES[i].type == "closing") validateClosing(GAMES[i]);
     else errors.push('Unknown game type defined: ' + GAMES[i].type);
   }
 

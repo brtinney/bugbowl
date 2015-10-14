@@ -10,6 +10,10 @@ var GameState = (function() {
   var _TEAM;
   var _POINTS;
   var _BOARD;
+  var _INDEX;
+  var _DOUBLE;
+  var _BID; // Double Points
+  var _WAGERS; // Final Trivia
 
   function GameState() {
 
@@ -19,16 +23,28 @@ var GameState = (function() {
       _TEAM = JSON.parse(localStorage.team);
       _ROUND = JSON.parse(localStorage.round);
       _BOARD = JSON.parse(localStorage.board);
+      _INDEX = JSON.parse(localStorage.index);
+      _DOUBLE = JSON.parse(localStorage.double);
+      _BID = JSON.parse(localStorage.bid);
+      _WAGERS = JSON.parse(localStorage.wagers);
     // Make a fresh game state
     } else {
       _POINTS = Array.apply(null, Array(CONFIG.teams.length)).map(Number.prototype.valueOf,0);
-      _TEAM = 0
-      _ROUND = 0
-      _BOARD = {}
+      _TEAM = 0;
+      _ROUND = 0;
+      _BOARD = {};
+      _INDEX = -1;
+      _DOUBLE = -1;
+      _BID = 0;
+      _WAGERS = Array.apply(null, Array(CONFIG.teams.length)).map(Number.prototype.valueOf,0);
       localStorage.points = JSON.stringify(_POINTS);
       localStorage.team = JSON.stringify(_TEAM);
       localStorage.round = JSON.stringify(_ROUND);
       localStorage.board = JSON.stringify(_BOARD);
+      localStorage.index = JSON.stringify(_INDEX);
+      localStorage.double = JSON.stringify(_DOUBLE);
+      localStorage.bid = JSON.stringify(_BID);
+      localStorage.wagers = JSON.stringify(_WAGERS);
     }
   };
 
@@ -36,10 +52,18 @@ var GameState = (function() {
   GameState.prototype.getRound = function() { return _ROUND; };
   GameState.prototype.getPoints = function() { return _POINTS; };
   GameState.prototype.getBoard = function() { return _BOARD; };
+  GameState.prototype.getQuestionIndex = function() { return _INDEX; };
+  GameState.prototype.getDoublePointsIndex = function() { return _DOUBLE; };
+  GameState.prototype.getDoublePointsBid = function() { return _BID; };
+  GameState.prototype.getWagers = function() { return _WAGERS; };
 
   GameState.prototype.setTeam = function(team) { _TEAM = team; localStorage.team = JSON.stringify(_TEAM); };
   GameState.prototype.setRound = function(round) { _ROUND = round; localStorage.round = JSON.stringify(_ROUND); };
   GameState.prototype.setPoints = function(points) { _POINTS = points; localStorage.points = JSON.stringify(_POINTS); };
+  GameState.prototype.setQuestionIndex = function(index) { _INDEX = index; localStorage.index = JSON.stringify(_INDEX); };
+  GameState.prototype.setDoublePointsIndex = function(double) { _DOUBLE = double; localStorage.double = JSON.stringify(_DOUBLE); };
+  GameState.prototype.setDoublePointsBid = function(bid) { _BID = bid; localStorage.bid = JSON.stringify(_BID); };
+  GameState.prototype.setWagers = function(wagers) { _WAGERS = wagers; localStorage.wagers = JSON.stringify(_WAGERS); };
 
   return GameState;
 })();
@@ -58,12 +82,20 @@ function sendCommand(cmd, data) {
 function runGame(game) {
 
   if (game.type == 'rebus') {
-    sendCommand('showScores', true);
     sendCommand('buildRebus', game);
+    if(game.points > 0) {
+      sendCommand('showScores', true);
+    }
+    else {
+      sendCommand('showAudience', true);
+      sendCommand('showScores', false);
+    }
     sendCommand('sizeStaticElements');
   }
 
   else if (game.type == 'categories') {
+    gameState.setQuestionIndex(-1);
+    gameState.setDoublePointsIndex(Math.floor(Math.random() * (game.board.length * game.pointValues.length)));
     sendCommand('showScores', true);
     sendCommand('buildCategories', game);
     sendCommand('sizeStaticElements');
@@ -73,12 +105,17 @@ function runGame(game) {
     sendCommand('showIntermission', game);
   }
 
+  else if (game.type == 'final_trivia') {
+
+  }
+
+  else if (game.type == 'closing') {
+
+  }
+
   else {
     alert('[ERROR] Unknown game type requested: ' + game.type)
   }
-
-  // TODO: update the value of the game mode select
-  //$("#rounds").val();
 }
 
 
@@ -87,7 +124,7 @@ function runGame(game) {
 var clientScreen = window.open("client.html", getWinName("client.html"), "toolbar=0,location=0,menubar=0")
 if (!clientScreen) alert("ERROR: Pop-up blocker seems to be enabled. Please allow popups for the client")
 var gameState;
-var INDEX_COUNTER = 0;
+var CAN_SCORE = false;
 
 function initialize() {
   localStorage.scores = JSON.stringify(Array.apply(null, Array(CONFIG.teams.length)).map(Number.prototype.valueOf,0));
@@ -107,8 +144,7 @@ function initialize() {
 // Allow client to initialize
 setTimeout(function(){
   sendCommand('initialize');
-  runGame(GAMES[gameState.getRound()]);
-
+  $('#rounds').val(gameState.getRound()).trigger('change');
 }, 150);
 
 
@@ -122,8 +158,8 @@ function updatePoints(team, points) {
   sendCommand('updateScores', scores);
 }
 
-function correct(){
-  //if (!CAN_SCORE) alert('score fault'); return;
+function correct() {
+  if (!CAN_SCORE) return;
   var game = GAMES[gameState.getRound()];
   sendCommand('hideQuestion')
 
@@ -133,24 +169,40 @@ function correct(){
     //nextTeam();
   }
   else if (game.type == "categories") {
+    var pts = ACTIVE_CELL.data('points');
+    console.log(gameState.getQuestionIndex());
+    if (gameState.getQuestionIndex() == gameState.getDoublePointsIndex()) {
+      pts = gameState.getDoublePointsBid();
+    }
     sendCommand('clearCategoriesBlock', [ACTIVE_CELL.data('column'), ACTIVE_CELL.data('row')]);
-    updatePoints(gameState.getTeam(), ACTIVE_CELL.data('points'));
+    updatePoints(gameState.getTeam(), pts);
+    gameState.setTeam(-1);
+    sendCommand('highlightTeam', -1);
   }
+  ACTIVE_CELL = null;
+  CAN_SCORE = false;
 }
 
-function incorrect(){
-  //if (!CAN_SCORE) alert('score fault'); return;
+function incorrect() {
+  if (!CAN_SCORE) return;
   var game = GAMES[gameState.getRound()];
 
   if (game.type == "rebus") {
     sendCommand('hideQuestion');
+    ACTIVE_CELL = null;
     nextTeam();
   }
   else if (game.type == "categories") {
+    var pts = ACTIVE_CELL.data('points');
+    if (gameState.getQuestionIndex() == gameState.getDoublePointsIndex()) {
+      pts = gameState.getDoublePointsBid();
+    }
     sendCommand('categoriesIncorrect');
-    updatePoints(gameState.getTeam(), -ACTIVE_CELL.data('points'));
+    updatePoints(gameState.getTeam(), -pts);
+    gameState.setTeam(-1);
+    sendCommand('highlightTeam', -1);
   }
-
+  CAN_SCORE = false;
 }
 
 function losingTeam() {
@@ -190,27 +242,42 @@ $(function() {
 
     // Rebus Solved
     $("#clearRebus").on("click", function(e){
-        var game = GAMES[gameState.getRound()];
-        sendCommand('clearRebus');
-        updatePoints(gameState.getTeam(), game.boardClearPoints)
+      var game = GAMES[gameState.getRound()];
+      sendCommand('clearRebus');
+      updatePoints(gameState.getTeam(), game.boardClearPoints)
     });
 
     $('#clearQuestion').on('click', function(e) {
       sendCommand('hideQuestion');
       sendCommand('clearCategoriesBlock', [ACTIVE_CELL.data('column'), ACTIVE_CELL.data('row')]);
+      ACTIVE_CELL = null;
+    });
+
+    $('#wager button').on('click', function(e) {
+      var bid = parseInt($('#wager input').val());
+      if(bid > 0) {
+        gameState.setDoublePointsBid(bid);
+        $('#wager').hide();
+      }
+      else {
+        alert('Invalid wager');
+      }
     });
 
     $(window).keydown(function(e) {
+      if(e.target.nodeName == 'INPUT') { e.keyCode = Infinity; } // For wagers
 
       // Team Selection (via keyboard)
       var team = e.keyCode - 49; // Offset ASCII, '1' = 0, '2' = 1
       if (team >= 0 && team < CONFIG.teams.length) {
         gameState.setTeam(team);
         sendCommand('highlightTeam', gameState.getTeam());
+        if(ACTIVE_CELL !== undefined && ACTIVE_CELL !== null) { CAN_SCORE = true; }
       }
 
       if (e.keyCode == 78) { // n
         nextTeam();
+        if(ACTIVE_CELL !== undefined && ACTIVE_CELL !== null) { CAN_SCORE = true; }
       }
 
       // Incorrect answer (Escape)
@@ -235,6 +302,7 @@ $(function() {
     $("#incorrect").on("click", incorrect);
 
     $("#rebus").on("click", '.rebusBlock', function(e){
+      CAN_SCORE = true;
       ACTIVE_CELL = $(this).data('block');
       sendCommand('renderQuestion', "This is a nice long question to which we would like the answer.  How about a few more characters?");
       renderAnswer('This is the answer');
@@ -242,25 +310,30 @@ $(function() {
     });
 
     $("#categories").on("click", '.categoriesOption', function(e) {
+      if(gameState.getTeam() >= 0) { CAN_SCORE = true; }
       var game = GAMES[gameState.getRound()];
-      if (INDEX_COUNTER == game.doublePoints) {
+      gameState.setQuestionIndex(gameState.getQuestionIndex()+1);
+      if (gameState.getQuestionIndex() == gameState.getDoublePointsIndex()) {
         sendCommand('doublePoints', true);
+        $('#wager').show();
       }
-      INDEX_COUNTER += 1;
+      else {
+        $('#wager').hide();
+      }
       ACTIVE_CELL = $(this);
       sendCommand('renderQuestion', "This is a nice long question to which we would like the answer.  How about a few more characters?");
       renderAnswer('This is the answer');
-      //sendCommand('clearRebusBlock', ACTIVE_CELL);
     });
 
     $('#doublePoints').on('click', function(e) {
+      if($('#wager').css('display') == 'block') { return; } // Short circuit accidental click
       sendCommand('doublePoints', false);
     });
 
     $("#rounds").on("change", function(e){
       gameState.setRound(parseInt($(this).val()));
       runGame(GAMES[parseInt($(this).val())]);
-      INDEX_COUNTER = 0;
+      gameState.setQuestionIndex(0);
       gameState.setTeam(losingTeam());
       sendCommand('highlightTeam', gameState.getTeam());
     });
