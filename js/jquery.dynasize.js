@@ -11,7 +11,7 @@ $.fn.dynasize = function() {
       var el = $(this).children("span");
 
       // Binary search for max size
-      for (var low = _MIN, high = _MAX, rounds = 0; low < high && rounds < 50; rounds) {
+      for (var low = _MIN, high = _MAX, rounds = 0; low < high && rounds < 50; rounds++) {
         var mid = ~~((high+low)/2);
         el.css('font-size', mid);
         if (el.height() > h || el.width() > w) high = mid;
