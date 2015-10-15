@@ -33,7 +33,7 @@ var GameState = (function() {
       _WAGERS = JSON.parse(localStorage.wagers);
     // Make a fresh game state
     } else {
-      _POINTS = Array.apply(null, Array(CONFIG.teams.length)).map(Number.prototype.valueOf,0);
+      _POINTS = Array(CONFIG.teams.length).fill(0);
       _TEAM = 0;
       _ROUND = 0;
       _BOARD = null;
@@ -42,7 +42,7 @@ var GameState = (function() {
       _INDEX = -1;
       _DOUBLE = -1;
       _BID = 0;
-      _WAGERS = Array.apply(null, Array(CONFIG.teams.length)).map(Number.prototype.valueOf,0);
+      _WAGERS = Array(CONFIG.teams.length).fill(0);
       localStorage.points = JSON.stringify(_POINTS);
       localStorage.team = JSON.stringify(_TEAM);
       localStorage.round = JSON.stringify(_ROUND);
@@ -98,7 +98,6 @@ var GameState = (function() {
   };
 
   GameState.prototype.updatePoints = function(team, points) {
-    console.log(team, points);
     _POINTS[team] += points;
     this.setPoints(_POINTS);
 
@@ -122,7 +121,7 @@ function sendCommand(cmd, data) {
 function runGame(game) {
 
   if (game.type == 'rebus') {
-    gameState.setBoard(createEmptyObjectArray(CONFIG.rebusColumn, CONFIG.rebusRow));
+    gameState.setBoard(Array(CONFIG.rebusColumn).fill(Array(CONFIG.rebusRow).fill({})));
     gameState.setQuestions(game.questions);
     sendCommand('buildRebus', game);
     if(game.points > 0) {
@@ -136,7 +135,7 @@ function runGame(game) {
   }
 
   else if (game.type == 'categories') {
-    gameState.setBoard(createEmptyObjectArray(game.board.length, game.pointValues.length));
+    gameState.setBoard(Array(game.board.length).fill(Array(game.pointValues.length).fill({})));
     gameState.setQuestions(game.board);
     gameState.setQuestionIndex(-1);
     gameState.setDoublePointsIndex(Math.floor(Math.random() * (game.board.length * game.pointValues.length)));
@@ -278,20 +277,6 @@ function nextTeam() {
 function renderAnswer(answer) {
   $("#answerDisplay").html("<span>"+answer+"</span>")
     .textfill({maxFontPixels:0});
-}
-
-function createEmptyObjectArray(col, row) {
-  var arr = [];
-  for(var i = 0; i < col; i++)
-  {
-    arr[i] = [];
-    for(var j = 0; j < row; j++)
-    {
-      arr[i][j] = {};
-    }
-  }
-
-  return $.extend([], arr);
 }
 
 $(function() {
