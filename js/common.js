@@ -53,7 +53,6 @@ function updateScores(scores){
 function showScores(visible){
   if (visible) $("#scores").fadeIn(CONFIG.transitionDuration);
   else $("#scores").fadeOut(CONFIG.transitionDuration);
-  updateScores(JSON.parse(localStorage.scores));
 }
 
 function showAudience(visible) {
@@ -63,6 +62,7 @@ function showAudience(visible) {
 
 function buildRebus(game){
   $("#rebus").empty();
+  $('#intermission').fadeOut(CONFIG.transitionDuration);
   $('clearQuestion').hide();
   showAudience(false);
 
@@ -70,6 +70,8 @@ function buildRebus(game){
     $('<div/>', {
         id: "rebus-"+i,
         "data-block": i,
+        "data-row": Math.floor(i / CONFIG.rebusColumn),
+        "data-column": i % CONFIG.rebusColumn,
         "class": "rebusBlock autosize",
         style: "width:"+(100/CONFIG.rebusColumn)+"%;height:"+(100/CONFIG.rebusRow)+"%",
         html: "<span>"+(i+1)+"</span>"
@@ -91,8 +93,10 @@ function clearRebusBlock(block) {
 
 function buildCategories(game){
   $("#categories").empty();
+  $('#intermission').fadeOut(CONFIG.transitionDuration);
+  $('#rebus').fadeOut(CONFIG.transitionDuration);
   showAudience(false);
-  $('#rebus, #clearRebus, #solution').hide();
+  $('#clearRebus, #solution').hide();
 
   $.each(game.board, function(i,v){
     // Create the container for the category
@@ -146,7 +150,20 @@ function sizeStaticElements(){
 
 
 function showIntermission(game) {
-  $("#rebus, #scores, #answer, #categories, #solution, #audience").fadeOut(CONFIG.transitionDuration)
+  $("#rebus, #scores, #answer, #categories, #solution, #audience").fadeOut(CONFIG.transitionDuration);
+  $('#intermission').empty().css('background-image', '');
+
+  if (/\.((png)|(jpg)|(jpeg)|(gif))$/i.test(game.source)) {
+    $('#intermission').css('background-image', 'url('+game.source+')');
+  }
+  else if (/\.((swf)|(flv))$/i.test(game.source)) {
+    $('#intermission').html('<embed src="'+game.source+'">');
+  }
+  else if (/\.((mov)|(mp4))$/i.test(game.source)) {
+    $('#intermission').html('<video autoplay src="'+game.source+'">');
+  }
+
+  $('#intermission').fadeIn(CONFIG.transitionDuration);
 }
 
 
