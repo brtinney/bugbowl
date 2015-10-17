@@ -14,7 +14,7 @@
           <span>Audience Participation</span>
         </div>
 
-        <div id="questionShell" class="admin">
+        <div id="questionShell" class="admin blurrable">
           <div id="questionDisplay" class="autosize"></div>
           <div id="answerDisplay" class="autosize"></div>
         </div>
@@ -22,13 +22,14 @@
           <span>DOUBLE POINTS</span>
         </div>
 
-        <div id="rebus" class="admin"></div>
-        <div id="scores" class="admin"></div>
-        <div id="categories" class="admin"></div>
+        <div id="rebus" class="admin blurrable"></div>
+        <div id="scores" class="admin blurrable"></div>
+        <div id="categories" class="admin blurrable"></div>
         <div id="intermission"></div>
 
         <div id="controls">
           <div id="solution">Solution here</div>
+          <button id="openMenu">MENU</button>
           <button id="clearRebus">Clear Rebus</button>
           <button id="clearQuestion" style="display: none;">Clear Question</button>
           <button id="correct">YES</button>
@@ -37,11 +38,22 @@
           <span id="next-round">&raquo;</span>
           <span id="wager"><input type="text" value="" placeholder="Enter team wager"><button>Set Wager</button></span>
         </div>
+
+        <div id="overlay">
+          <div id="scoreModal" class="modal">
+            <div id="scores"></div>
+            <button id="saveScores">Save Scores</button>
+
+            <button id="destroyState">Destroy Saved Data</button>
+          </div>
+
+        </div>
+
         <script src="js/jquery-2.1.4.min.js"></script>
         <script src="js/jquery.textfill.min.js"></script>
         <script src="js/jquery.dynasize.js"></script>
         <script src="assets/questions.js"></script>
-        <script src="js/validation.js"></script>
+        <script src="js/validation.js"></script> <!-- required before server.js -->
         <script src="js/server.js"></script>
         <script src="js/common.js"></script>
     </body>

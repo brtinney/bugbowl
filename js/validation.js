@@ -1,3 +1,5 @@
+STORAGE_VALID = true
+
 // Checks the defined game for accuracy
 $(function(){
 
@@ -42,15 +44,28 @@ $(function(){
   }
 
   function validateClosing(game) {
-    
+
+  }
+
+  function validateStoredState() {
+    var vars = ['points', 'team', 'round', 'board', 'active_question', 'questions', 'index', 'double', 'bid', 'wagers'];
+    var valid = true;
+    for (var i in vars) {
+      if (localStorage.length && !localStorage[vars[i]]) {
+        errors.push('Saved state missing required variable: ' + vars[i]);
+        valid = false;
+      }
+    }
+    STORAGE_VALID = localStorage.length == vars.length && valid;
   }
 
   // Check for environment requirements
-  if (!localStorage.getItem) alert("ERROR: LocalStorage unavailable")
+  if (!localStorage.getItem) errors.push('LocalStorage unavailable')
 
   // Check for existance of top level objects
   if (!GAMES || !Array.isArray(GAMES)) errors.push('No games defined')
   if (!CONFIG) errors.push('Global configuration object not defined')
+  validateStoredState();
 
   // Perform game specific vlaidations
   for (var i = 0; i < GAMES.length; ++i) {

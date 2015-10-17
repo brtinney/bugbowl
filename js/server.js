@@ -17,10 +17,12 @@ var GameState = (function() {
   var _BID; // Double Points
   var _WAGERS; // Final Trivia
 
-  function GameState() {
+  function GameState(reload) {
 
     // Load previous game state from localstorage
-    if (confirm("Do you want to use existing game state?")) {
+    //if (confirm("Do you want to use existing game state?")) {
+    if (reload && STORAGE_VALID) {
+      console.log('[INFO] Restoring existing game state')
       _POINTS = JSON.parse(localStorage.points);
       _TEAM = JSON.parse(localStorage.team);
       _ROUND = JSON.parse(localStorage.round);
@@ -33,6 +35,7 @@ var GameState = (function() {
       _WAGERS = JSON.parse(localStorage.wagers);
     // Make a fresh game state
     } else {
+      console.log('[INFO] Creating new game state')
       _POINTS = Array(CONFIG.teams.length).fill(0);
       _TEAM = 0;
       _ROUND = 0;
@@ -153,7 +156,7 @@ function runGame(game) {
   }
 
   else if (game.type == 'closing') {
-
+    sendCommand('closing')
   }
 
   else {
@@ -170,7 +173,7 @@ var gameState;
 var CAN_SCORE = false;
 
 function initialize() {
-  gameState = new GameState();
+  gameState = new GameState(true);
 
   $.each(GAMES, function(i,v){ $('<option/>', {
       value: i,
@@ -279,6 +282,12 @@ function renderAnswer(answer) {
     .textfill({maxFontPixels:0});
 }
 
+function showModal() {
+  $('.blurrable').addClass('blurred');
+  $("#overlay").fadeIn();
+}
+
+
 $(function() {
 
     // Rebus Solved
@@ -325,7 +334,14 @@ $(function() {
 
       // Incorrect answer (Escape)
       if (e.keyCode == 27) {
-        incorrect();
+        // Override when modal visible
+        if ($("#overlay:visible").length) {
+          $("#overlay").fadeOut();
+          $(".blurrable").removeClass('blurred');
+        }
+        else {
+          incorrect();
+        }
       }
 
       if (e.keyCode == 13) {
@@ -337,6 +353,10 @@ $(function() {
     $("#scores").on("click", ".score", function(e){
       gameState.setTeam($(this).data('team'));
       sendCommand('highlightTeam', gameState.getTeam());
+    });
+
+    $("#openMenu").on("click", function(e){
+      showModal();
     });
 
     //$("#correct").on("click", function(e){ sendCommand('clearRebusBlock', ACTIVE_CELL); });
@@ -397,5 +417,10 @@ $(function() {
     $('#next-round').on("click", function(e) {
       var round = gameState.getRound();
       $('#rounds').val(round+1).trigger('change');
+    });
+
+    $("#destroyState").on("click", function(e){
+      localStorage.clear();
+      location.reload();
     });
 });
