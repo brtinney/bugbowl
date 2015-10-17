@@ -362,9 +362,15 @@ $(function() {
       sendCommand('highlightTeam', gameState.getTeam());
     });
 
-    $("#openMenu").on("click", function(e){
+    $("#openMenu").on("click", showModal);
+
+    /*
+    // TODO: Re-enable context menu bind when we don't need to inspect things
+    $(document).bind("contextmenu",function(e){
       showModal();
-    });
+      return false;
+   });
+   */
 
     //$("#correct").on("click", function(e){ sendCommand('clearRebusBlock', ACTIVE_CELL); });
     //$("#incorrect").on("click", function(e){ sendCommand('rebusIncorrect'); });
@@ -414,6 +420,7 @@ $(function() {
     });
 
     $("#rounds").on("change", function(e){
+      closeModal();
       gameState.setRound(parseInt($(this).val()));
       runGame(GAMES[parseInt($(this).val())]);
       gameState.setQuestionIndex(0);

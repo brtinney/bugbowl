@@ -172,12 +172,15 @@ body {
 .rebusBlock {
 	float:left;
 	text-align: center;
-	background:#000;
-	color:#FFF;
+	background: linear-gradient(to bottom, #93cede 0%,#75bdd1 41%,#49a5bf 100%);
 	cursor: pointer;
+	box-sizing: border-box;
+	border:1px solid #FFF;
+	text-shadow: 2px 2px 3px rgba(0,0,0,0.6);
+	font-weight: bold;
 }
 #rebus.admin .rebusBlock:hover {
-	background:#555;
+	box-shadow: inset 0 0 30px rgba(0,0,0,0.8);
 }
 .rebusBlock.clear {
 	visibility: hidden;
@@ -221,6 +224,7 @@ body {
 	color:#FFF;
 	cursor: pointer;
 	font-weight: bold;
+	border-bottom:3px solid #FFF;
 }
 .categoriesOption {
 	text-align: center;
