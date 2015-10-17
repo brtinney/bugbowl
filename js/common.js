@@ -23,8 +23,7 @@ var rescaleTimeout = null;
 
 function renderQuestion(text) {
   $("#questionShell").show();
-  $("#questionDisplay").html("<span>"+text+"</span>")
-    .textfill({maxFontPixels:0});
+  $("#questionDisplay").html("<span>"+text+"</span>").dynasize();
   $("#questionShell").hide()
     .fadeIn(CONFIG.transitionDuration);
 }
@@ -62,7 +61,7 @@ function showAudience(visible) {
 
 function buildRebus(game){
   $("#rebus").empty();
-  $('#intermission').fadeOut(CONFIG.transitionDuration);
+  $('#intermission, #categories').fadeOut(CONFIG.transitionDuration);
   $('clearQuestion').hide();
   showAudience(false);
 
@@ -73,6 +72,8 @@ function buildRebus(game){
         "data-row": Math.floor(i / CONFIG.rebusColumn),
         "data-column": i % CONFIG.rebusColumn,
         "class": "rebusBlock autosize",
+        "data-sizegroup": "rebusBlock",
+        "data-sizefactor": 0.5,
         style: "width:"+(100/CONFIG.rebusColumn)+"%;height:"+(100/CONFIG.rebusRow)+"%",
         html: "<span>"+(i+1)+"</span>"
       }).appendTo("#rebus")
@@ -111,7 +112,8 @@ function buildCategories(game){
           "class": "categoriesHeader autosize",
           style: "width:100%;height:"+(100/(v.questions.length+1))+"%",
           html: "<span>"+v.category+"</span>",
-          "data-sizegroup": "categoriesHeader"
+          "data-sizegroup": "categoriesHeader",
+          "data-sizefactor": .9
         }).appendTo("#"+containerName)
 
     for (var idx = 0; idx < v.questions.length; ++idx)
@@ -121,6 +123,7 @@ function buildCategories(game){
             "data-row": idx,
             "data-points": game.pointValues[idx],
             "data-sizegroup": "categoriesOption",
+            "data-sizefactor": 0.35,
             style: "width:100%;height:"+(100/(v.questions.length+1))+"%",
             html: "<span>"+game.pointValues[idx]+"</span>"
           }).appendTo("#"+containerName)
@@ -136,7 +139,7 @@ function clearCategoriesBlock(arr) {
 
 function doublePoints(show) {
   if(show)
-    $('#doublePoints').show().textfill({maxFontPixels:0});
+    $('#doublePoints').show().dynasize();
   else
     $('#doublePoints').hide();
 }
@@ -145,7 +148,7 @@ function doublePoints(show) {
 function sizeStaticElements(){
   //$("#questionDisplay").css('padding', $("#questionDisplay").width() * CONFIG.questionPadding)
   //$(".autosize").textfill({maxFontPixels:0});
-  $(".autosize").dynasize();
+  $(".autosize:visible").dynasize();
 }
 
 
@@ -169,7 +172,7 @@ function showIntermission(game) {
 
 $(window).resize(function(){
   clearTimeout(rescaleTimeout);
-  rescaleTimeout = setTimeout(sizeStaticElements, 50);
+  rescaleTimeout = setTimeout(sizeStaticElements, 100);
 });
 
 $(sizeStaticElements);

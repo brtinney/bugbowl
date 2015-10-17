@@ -286,6 +286,10 @@ function showModal() {
   $('.blurrable').addClass('blurred');
   $("#overlay").fadeIn();
 }
+function closeModal() {
+  $("#overlay").fadeOut();
+  $(".blurrable").removeClass('blurred');
+}
 
 
 $(function() {
@@ -327,6 +331,10 @@ $(function() {
         if(ACTIVE_CELL !== undefined && ACTIVE_CELL !== null) { CAN_SCORE = true; }
       }
 
+      if (e.keyCode == 77) { // m
+        showModal();
+      }
+
       if (e.keyCode == 78) { // n
         nextTeam();
         if(ACTIVE_CELL !== undefined && ACTIVE_CELL !== null) { CAN_SCORE = true; }
@@ -336,8 +344,7 @@ $(function() {
       if (e.keyCode == 27) {
         // Override when modal visible
         if ($("#overlay:visible").length) {
-          $("#overlay").fadeOut();
-          $(".blurrable").removeClass('blurred');
+          closeModal();
         }
         else {
           incorrect();
@@ -420,7 +427,9 @@ $(function() {
     });
 
     $("#destroyState").on("click", function(e){
-      localStorage.clear();
-      location.reload();
+      if (confirm("Are you sure you want to delete the existing game state?  This will reload the game.")) {
+        localStorage.clear();
+        location.reload();
+      }
     });
 });

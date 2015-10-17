@@ -15,9 +15,10 @@
         </div>
 
         <div id="questionShell" class="admin blurrable">
-          <div id="questionDisplay" class="autosize"></div>
-          <div id="answerDisplay" class="autosize"></div>
+          <div id="questionDisplay" class="autosize" data-sizefactor="0.7"></div>
+          <div id="answerDisplay" class="autosize" data-sizefactor="0.7"></div>
         </div>
+
         <div id="doublePoints" class="autosize">
           <span>DOUBLE POINTS</span>
         </div>
@@ -34,16 +35,16 @@
           <button id="clearQuestion" style="display: none;">Clear Question</button>
           <button id="correct">YES</button>
           <button id="incorrect">X</button>
-          <select id="rounds"></select>
           <span id="next-round">&raquo;</span>
           <span id="wager"><input type="text" value="" placeholder="Enter team wager"><button>Set Wager</button></span>
         </div>
 
         <div id="overlay">
           <div id="scoreModal" class="modal">
+            <h1>Menu</h1>
             <div id="scores"></div>
             <button id="saveScores">Save Scores</button>
-
+            <select id="rounds"></select>
             <button id="destroyState">Destroy Saved Data</button>
           </div>
 
