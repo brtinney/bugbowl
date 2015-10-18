@@ -290,7 +290,7 @@ function nextTeam() {
 }
 
 function renderAnswer(answer) {
-  $("#answerDisplay").html("<span>"+answer+"</span>").dynasize()
+  $("#answerDisplay").html("<span>"+answer+"</span>").dynasize();
 }
 
 function showModal() {

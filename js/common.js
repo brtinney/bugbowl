@@ -4,6 +4,7 @@ $(function(){
   $.each(CONFIG.teams, function(i,v){ $('<div/>', {
       id: "score-"+i,
       "data-team": i,
+      "data-sizefactor": 0.8,
       "class": "score autosize",
       style: "width:"+(100/CONFIG.teams.length)+"%",
       html: '<div class="name">'+v+'</div><span class="value">0</span>'
@@ -49,7 +50,7 @@ function showScores(visible){
 }
 
 function showAudience(visible) {
-  if (visible) $("#audience").fadeIn(CONFIG.transitionDuration);
+  if (visible) $("#audience").css({'opacity': 0, 'display': 'table'}).animate({'opacity': 1}, CONFIG.transitionDuration);
   else $("#audience").fadeOut(CONFIG.transitionDuration);
 }
 
@@ -149,9 +150,10 @@ function sizeStaticElements(){
 
 function showIntermission(game) {
   $("section").fadeOut(CONFIG.transitionDuration);
+  $("#solution").hide();
   $('#intermission').empty().css('background-image', '');
 
-  if (/\.((png)|(jpg)|(jpeg)|(gif))$/i.test(game.source)) {
+  if (/\.((png)|(jpg)|(jpeg)|(gif)|(svg))$/i.test(game.source)) {
     $('#intermission').css('background-image', 'url('+game.source+')');
   }
   else if (/\.((swf)|(flv))$/i.test(game.source)) {
@@ -159,6 +161,11 @@ function showIntermission(game) {
   }
   else if (/\.((mov)|(mp4))$/i.test(game.source)) {
     $('#intermission').html('<video autoplay src="'+game.source+'">');
+  }
+
+  if(game.text) {
+    $('#intermission').data('sizefactor', '0.3');
+    $('#intermission').html('<span>'+game.text+'</span>').dynasize();
   }
 
   $('#intermission').fadeIn(CONFIG.transitionDuration);

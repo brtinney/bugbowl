@@ -14,7 +14,8 @@ html {
 body {
 	background: #000;
 	color: #FFF;
-	font-family: "Lucida Grande", Helvetica, Arial, sans-serif;
+	font-family: "Century Gothic", Helvetica, Arial, sans-serif;
+	font-weight: bold;
 	font-size: 10px;
 	height: 100%;
 	width: 100%;
@@ -26,7 +27,8 @@ body {
 	top: 0%;
 	height:12%;
 	display:none;
-	border: 10px solid #8EB2FF;
+	border-bottom: 2px solid #000;
+	/*border: 10px solid #BE8B4A;*/
 }
 #audience {
 	width: 100%;
@@ -34,8 +36,10 @@ body {
 	top: 0%;
 	height:12%;
 	display:none;
-	border: 10px solid #8EB2FF;
+	/*border: 10px solid #BE8B4A;*/
 	text-align: center;
+	color: #BE8B4A;
+	border-bottom: 2px solid #000;
 }
 #scores .score {
 	text-align: center;
@@ -48,12 +52,7 @@ body {
 }
 #scores .score .name {
 	display: block;
-  position: absolute;
-  top: -10px;
-  background-color: #000;
-  color: #8EB2FF;
-	width: 80%;
-	left: 10%;
+  color: #BE8B4A;
 	overflow: hidden;
 	white-space: nowrap;
 	text-overflow: ellipsis;
@@ -63,17 +62,12 @@ body {
 }
 #scores .score .value {
 	display: block;
-	padding-top: 4px;
 }
 #scores.admin .score:hover,  #scores .score.active {
 	background:#fff;
 	font-weight: bold;
 	color:#000;
 	transition: background 350ms, color 350ms, font-weight 350ms ;
-}
-#scores.admin .score:hover .name,  #scores .score.active .name {
-	background-color: #FFF;
-	font-weight: normal;
 }
 #static-sections div {
 	width: 100%;
@@ -114,7 +108,7 @@ body {
 	z-index: 101;
 	width:100%;
 	height:80%;
-	background:darkblue;
+	background:#10273E;
 	display:none;
 	box-shadow: inset 0 0 100px rgba(0,0,0,0.8);
 }
@@ -126,7 +120,7 @@ body {
 	z-index: 102;
 	width:100%;
 	height:80%;
-	background:darkorange;
+	background:#FF4940;
 	cursor: pointer;
 	display:none;
 	box-shadow: inset 0 0 100px rgba(0,0,0,0.8);
@@ -154,7 +148,7 @@ body {
 	height:25%;
 	width:70%;
 	text-shadow: 2px 4px 3px rgba(0,0,0,0.6);
-	color: #FC0;
+	color: #F4D28A;
 	border-top: 3px solid #666;
 }
 #rebus {
@@ -167,12 +161,11 @@ body {
 	background-size:100% 100%;
 	background-repeat: no-repeat;
 	display: none;
-	border: 10px solid #FC0;
 }
 .rebusBlock {
 	float:left;
 	text-align: center;
-	background: linear-gradient(to bottom, #93cede 0%,#75bdd1 41%,#49a5bf 100%);
+	background: linear-gradient(to bottom, #81C3D5 0%,#258BA9 41%,#258BA9 100%);
 	cursor: pointer;
 	box-sizing: border-box;
 	border:1px solid #FFF;
@@ -188,7 +181,7 @@ body {
 #solution {
 	text-align: center;
 	font-size: 150%;
-	color: #FC0;
+	color: #F4D28A;
 	display: none;
 }
 #intermission {
@@ -200,10 +193,15 @@ body {
 	text-align: center;
 	background-repeat: no-repeat;
 	background-clip: border-box;
+	background-size: contain;
 }
 #intermission * {
 	width: 100%;
 	height: 100%;
+}
+#intermission span {
+	display: block;
+	padding: 20% 5%;
 }
 #categories {
 	display:none;
@@ -212,7 +210,6 @@ body {
 	height:80%;
 	width:100%;
 	text-align: center;
-	border: 10px solid #FC0;
 }
 .categoriesColumn {
 	display: inline-block;
@@ -220,20 +217,29 @@ body {
 .categoriesHeader {
 	display:inline-block;
 	text-align: center;
-	background:#000;
+	background: linear-gradient(to bottom, #258BA9 0%,#10273E 9%,#10273E 100%);
+	text-shadow: 2px 2px 3px rgba(0,0,0,0.6);
 	color:#FFF;
 	cursor: pointer;
 	font-weight: bold;
 	border-bottom:3px solid #FFF;
+	border-left: 1px solid #FFF;
+}
+#categoriesColumn-0 .categoriesHeader {
+	border-left: none;
 }
 .categoriesOption {
-	text-align: center;
-	background:#000;
 	color:#FFF;
+	text-align: center;
+	background: linear-gradient(to bottom, #81C3D5 0%,#258BA9 41%,#258BA9 100%);
 	cursor: pointer;
+	box-sizing: border-box;
+	border:1px solid #FFF;
+	text-shadow: 2px 2px 3px rgba(0,0,0,0.6);
+	font-weight: bold;
 }
 #categories.admin .categoriesOption:hover {
-	background:#555;
+	box-shadow: inset 0 0 30px rgba(0,0,0,0.8);
 }
 .categoriesOption.clear {
 	visibility: hidden;
@@ -241,6 +247,7 @@ body {
 #next-round {
 	font-size: 180%;
 	cursor: pointer;
+	color: #BE8B4A;
 }
 #wager {
 	position: absolute;
