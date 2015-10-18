@@ -3,32 +3,21 @@ STORAGE_VALID = true
 // Checks the defined game for accuracy
 $(function(){
 
-  var errors = []
+  var errors = [];
+  var callbacksPending = 0;
 
-  function imageExists(url) {
+  function verifyAsset(url, game) {
+    callbacksPending++;
     var img = new Image();
+    img.onerror = function(e){ callbacksPending--; errors.push(game.name + ' not found on disk') };
+    img.onload = function(e) { callbacksPending--; }
     img.src = url;
-    //var now = new Date().getTime();
-    //while(new Date().getTime() < now + 5000);
-    return img.height != 0;
-  }
-
-  function fileExists(url) {
-    if(url){
-      var req = new XMLHttpRequest();
-      req.open('GET', url, false);
-      req.send();
-      return req.status == 200;
-    } else {
-      return false;
-    }
   }
 
   function validateRebus(game) {
     if (!game.image) errors.push(game.name + ' missing background image')
     if (!game.solution) errors.push(game.name + ' missing solution')
-
-    //if (!imageExists(game.image)) errors.push(game.name + ' specified invalid image')
+    verifyAsset(game.image, game);
   }
 
   function validateIntermission(game) {
