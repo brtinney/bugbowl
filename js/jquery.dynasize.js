@@ -1,3 +1,12 @@
+/*
+  dynasize
+ @name      jquery.dynasize.js
+ @author    FrankieKP
+ @version   0.0.3
+ @date      2015-10-17
+ @copyright (c) 2015 FrankieKP
+ @license   MIT License
+*/
 $.fn.dynasize = function() {
 
   var _MAX = 500;   // Max font size to render
