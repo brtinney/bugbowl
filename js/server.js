@@ -343,7 +343,12 @@ $(function() {
       }
 
       if (e.keyCode == 77) { // m
-        showModal();
+        if ($("#overlay:visible").length) {
+          closeModal();
+        }
+        else {
+          showModal();
+        }
       }
 
       if (e.keyCode == 78) { // n
