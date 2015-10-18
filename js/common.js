@@ -10,13 +10,6 @@ $(function(){
     }).appendTo("#scores")
   })
 
-    /*' \
-    <div class="score autosize" id="score-'+e+'" style="width:'+(100/CONFIG.teams.length)+'%"> \
-      <span>0</span> \
-    </div>') });
-    */
-  //updateScores()
-
 });
 
 var rescaleTimeout = null;
@@ -61,7 +54,7 @@ function showAudience(visible) {
 
 function buildRebus(game){
   $("#rebus").empty();
-  $('#intermission, #categories').fadeOut(CONFIG.transitionDuration);
+  $("section").fadeOut(CONFIG.transitionDuration);
   $('clearQuestion').hide();
   showAudience(false);
 
@@ -94,8 +87,7 @@ function clearRebusBlock(block) {
 
 function buildCategories(game){
   $("#categories").empty();
-  $('#intermission').fadeOut(CONFIG.transitionDuration);
-  $('#rebus').fadeOut(CONFIG.transitionDuration);
+  $("section").fadeOut(CONFIG.transitionDuration);
   showAudience(false);
   $('#clearRebus, #solution').hide();
 
@@ -137,6 +129,11 @@ function clearCategoriesBlock(arr) {
   $("#categoriesColumn-"+arr[0]+" .categoriesOption").eq(arr[1]).addClass('clear');
 }
 
+function showClosing() {
+  $("section").fadeOut(CONFIG.transitionDuration);
+  $("#final").fadeIn(CONFIG.transitionDuration);
+}
+
 function doublePoints(show) {
   if(show)
     $('#doublePoints').show().dynasize();
@@ -146,14 +143,11 @@ function doublePoints(show) {
 
 // Handle dynamic size elements
 function sizeStaticElements(){
-  //$("#questionDisplay").css('padding', $("#questionDisplay").width() * CONFIG.questionPadding)
-  //$(".autosize").textfill({maxFontPixels:0});
   $(".autosize:visible").dynasize();
 }
 
-
 function showIntermission(game) {
-  $("#rebus, #scores, #answer, #categories, #solution, #audience").fadeOut(CONFIG.transitionDuration);
+  $("section").fadeOut(CONFIG.transitionDuration);
   $('#intermission').empty().css('background-image', '');
 
   if (/\.((png)|(jpg)|(jpeg)|(gif))$/i.test(game.source)) {

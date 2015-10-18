@@ -156,7 +156,7 @@ function runGame(game) {
   }
 
   else if (game.type == 'closing') {
-    sendCommand('closing')
+    sendCommand('showClosing')
   }
 
   else {
@@ -278,8 +278,7 @@ function nextTeam() {
 }
 
 function renderAnswer(answer) {
-  $("#answerDisplay").html("<span>"+answer+"</span>")
-    .textfill({maxFontPixels:0});
+  $("#answerDisplay").html("<span>"+answer+"</span>").dynasize()
 }
 
 function showModal() {

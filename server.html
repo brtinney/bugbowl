@@ -10,23 +10,31 @@
         <link rel="stylesheet" href="css/bugbowl.css" type="text/css">
     </head>
     <body>
-        <div id="audience" class="autosize">
+        <section id="audience" class="autosize">
           <span>Audience Participation</span>
-        </div>
+        </section>
 
-        <div id="questionShell" class="admin blurrable">
+        <section id="questionShell" class="admin blurrable">
           <div id="questionDisplay" class="autosize" data-sizefactor="0.7"></div>
           <div id="answerDisplay" class="autosize" data-sizefactor="0.7"></div>
-        </div>
+        </section>
 
-        <div id="doublePoints" class="autosize">
+        <section id="doublePoints" class="autosize">
           <span>DOUBLE POINTS</span>
-        </div>
+        </section>
 
-        <div id="rebus" class="admin blurrable"></div>
-        <div id="scores" class="admin blurrable"></div>
-        <div id="categories" class="admin blurrable"></div>
-        <div id="intermission"></div>
+        <section id="rebus" class="admin blurrable"></section>
+        <section id="scores" class="admin blurrable"></section>
+        <section id="categories" class="admin blurrable"></section>
+        <section id="intermission"></section>
+
+
+        <section id="final">
+          <div id="winningTeam">TEAM 1</div>
+          <div id="finalScores"></div>
+          <canvas id="fireworks"></canvas>
+        </section>
+
 
         <div id="controls">
           <div id="solution">Solution here</div>
@@ -51,11 +59,11 @@
         </div>
 
         <script src="js/jquery-2.1.4.min.js"></script>
-        <script src="js/jquery.textfill.min.js"></script>
         <script src="js/jquery.dynasize.js"></script>
         <script src="assets/questions.js"></script>
         <script src="js/validation.js"></script> <!-- required before server.js -->
         <script src="js/server.js"></script>
         <script src="js/common.js"></script>
+        <script src="js/fireworks.js"></script>
     </body>
 </html>
