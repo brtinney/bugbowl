@@ -142,8 +142,8 @@ function runGame(game) {
     gameState.setQuestions(game.board);
     gameState.setQuestionIndex(-1);
     gameState.setDoublePointsIndex(Math.floor(Math.random() * (game.board.length * game.pointValues.length)));
-    sendCommand('showScores', true);
     sendCommand('buildCategories', game);
+    sendCommand('showScores', true);
     sendCommand('sizeStaticElements');
   }
 

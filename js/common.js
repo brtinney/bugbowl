@@ -86,8 +86,8 @@ function clearRebusBlock(block) {
 }
 
 function buildCategories(game){
-  $("#categories").empty();
   $("section").fadeOut(CONFIG.transitionDuration);
+  $("#categories").empty();
   showAudience(false);
   $('#clearRebus, #solution').hide();
 
@@ -122,7 +122,7 @@ function buildCategories(game){
   })
 
   $("#correct, #incorrect, #clearQuestion").show();
-  $('#categories').css('display', 'table');
+  $('#categories').fadeIn(CONFIG.transitionDuration);
 }
 
 function clearCategoriesBlock(arr) {
