@@ -100,10 +100,15 @@ var GameState = (function() {
     return _ACTIVE_QUESTION;
   };
 
-  GameState.prototype.updatePoints = function(team, points) {
-    _POINTS[team] += points;
+  GameState.prototype.updatePoints = function(team, delta) {
+    _POINTS[team] += delta;
     this.setPoints(_POINTS);
+    return _POINTS;
+  }
 
+  GameState.prototype.replacePoints = function(team, absolute) {
+    _POINTS[team] = absolute;
+    this.setPoints(_POINTS);
     return _POINTS;
   }
 
@@ -172,13 +177,20 @@ if (!clientScreen) alert("ERROR: Pop-up blocker seems to be enabled. Please allo
 var gameState;
 var CAN_SCORE = false;
 
+
 function initialize() {
   gameState = new GameState(true);
 
   $.each(GAMES, function(i,v){ $('<option/>', {
       value: i,
-      html: v.name
+      html: v.name,
+      class: v.type
     }).appendTo("#rounds")
+  })
+
+  $.each(CONFIG.teams, function(i,v){
+    $("#scores_names").append('<td width="'+(100/CONFIG.teams.length)+'%">'+v+'</td>');
+    $("#scores_values").append('<td><input type="number" id="overridePoints-'+i+'" data-team="'+i+'" class="overridePoints" /></td>')
   })
 
   sendCommand('highlightTeam', gameState.getTeam());
@@ -437,5 +449,13 @@ $(function() {
         localStorage.clear();
         location.reload();
       }
+    });
+
+    $("#overrideScores").on("click", function(e){
+      $.each($(".overridePoints"), function(i, el){
+        gameState.replacePoints($(el).data('team'), parseInt($(el).val(), 10))
+      });
+      sendCommand('updateScores', gameState.getPoints());
+      closeModal();
     });
 });

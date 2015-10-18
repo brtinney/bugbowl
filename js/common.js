@@ -39,6 +39,7 @@ function updateBoard(){
 function updateScores(scores){
   $.each(CONFIG.teams, function(i,v){
     $('#score-'+i+' span.value').text(scores[i]);
+    $('#overridePoints-'+i).val(scores[i]);
   })
 }
 

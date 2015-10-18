@@ -49,10 +49,15 @@
 
         <div id="overlay">
           <div id="scoreModal" class="modal">
-            <h1>Menu</h1>
-            <div id="scores"></div>
-            <button id="saveScores">Save Scores</button>
-            <select id="rounds"></select>
+            <h1>Game Menu</h1>
+            <table id="updateScores">
+              <tr id="scores_names"></tr>
+              <tr id="scores_values"></tr>
+            </table>
+            <button id="overrideScores">Override Scores</button>
+            <hr />
+            Change board: <select id="rounds"></select>
+            <hr />
             <button id="destroyState">Destroy Saved Data</button>
           </div>
 

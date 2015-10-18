@@ -262,7 +262,7 @@ body {
 	display: none;
 }
 .modal {
-	background:#FFF;
+	background:rgba(255, 255, 255, 0.6);
 	color:#000;
 	padding:20px;
 	position: absolute;
@@ -273,6 +273,21 @@ body {
 	border-radius:10px;
 	min-height: 300px;
 }
+.modal h1 {
+	font-size:28px;
+	text-align: center;
+	font-weight: bold;
+	padding:10px;
+}
+.modal select {
+	padding:5px;
+	font-size:15px;
+	margin:20px 0;
+}
+.modal select option.intermission { color:darkred; }
+.modal select option.categories { color: green; }
+.modal select option.rebus { color: green; }
+
 .blurred {
 	-webkit-filter: blur(5px);
   -moz-filter: blur(5px);
@@ -303,4 +318,22 @@ body {
 	z-index: -1;
 	height:100%;
 	width:100%;
+}
+#updateScores {
+	width:100%;
+	font-size:14px;
+	text-align: center;
+	margin:10px 0;
+}
+#updateScores td {
+	padding:5px;
+	border:1px solid #CCC;
+	text-overflow: clip;
+}
+#updateScores input {
+	width:100%;
+	padding:5px;
+	font-size:20px;
+	text-align: center;
+	font-weight: bold;
 }
