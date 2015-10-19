@@ -344,3 +344,34 @@ body {
 	text-align: center;
 	font-weight: bold;
 }
+
+section#finalTrivia {
+	width:100%;
+	height:100%;
+	position:fixed;
+	top:0;
+	left:0;
+	background:darkblue;
+	box-shadow: inset 0 0 100px rgba(0,0,0,0.8);
+	text-shadow: 2px 4px 3px rgba(0,0,0,0.6);
+}
+section#finalTrivia #finalTriviaTitle {
+	display:table;
+	text-align: center;
+	height:10%;
+	width:100%;
+	color:gold;
+}
+#finalTriviaQuestion {
+	display:table;
+	position:absolute;
+	right:5%;
+	height:80%;
+	width:65%;
+	text-align: center;
+}
+#finalTrivia .finalTimer {
+	position:absolute;
+	top:40%;
+	left:5%;
+}

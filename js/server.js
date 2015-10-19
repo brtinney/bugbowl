@@ -157,7 +157,7 @@ function runGame(game) {
   }
 
   else if (game.type == 'final_trivia') {
-
+    sendCommand('showFinalTrivia', game)
   }
 
   else if (game.type == 'closing') {
@@ -174,7 +174,7 @@ function runGame(game) {
 // Reference to the client window
 var clientScreen = window.open("client.html", getWinName("client.html"), "toolbar=0,location=0,menubar=0")
 if (!clientScreen) alert("ERROR: Pop-up blocker seems to be enabled. Please allow popups for the client")
-window.onunload = window.onbeforeunload = function() { clientScreen.close(); }
+//window.onunload = window.onbeforeunload = function() { clientScreen.close(); }
 var gameState;
 var CAN_SCORE = false;
 

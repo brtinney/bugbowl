@@ -28,6 +28,11 @@
         <section id="categories" class="admin blurrable"></section>
         <section id="intermission"></section>
 
+        <section id="finalTrivia">
+          <h1 id="finalTriviaTitle" class="title autosize" data-sizefactor="0.8">Final Question</h1>
+          <div id="finalTriviaQuestion" class="autosize" data-sizefactor="0.8"></div>
+          <input type="text" value="" id="finalTimer" class="dial">
+        </section>
 
         <section id="final">
           <div id="winningTeam">TEAM 1</div>
@@ -60,11 +65,11 @@
             <hr />
             <button id="destroyState">Destroy Saved Data</button>
           </div>
-
         </div>
 
         <script src="js/jquery-2.1.4.min.js"></script>
         <script src="js/jquery.dynasize.js"></script>
+        <script src="js/jquery.knob.min.js"></script>
         <script src="assets/questions.js"></script>
         <script src="js/validation.js"></script> <!-- required before server.js -->
         <script src="js/server.js"></script>

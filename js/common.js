@@ -138,7 +138,7 @@ function showClosing() {
 
 function doublePoints(show) {
   if(show)
-    $('#doublePoints').show().dynasize();
+    $('#doublePoints').css('display', 'table').dynasize();
   else
     $('#doublePoints').hide();
 }
@@ -169,6 +169,40 @@ function showIntermission(game) {
   }
 
   $('#intermission').fadeIn(CONFIG.transitionDuration);
+}
+
+
+function showFinalTrivia(game){
+  $("section").fadeOut(CONFIG.transitionDuration);
+  $("#finalTrivia").fadeIn(CONFIG.transitionDuration);
+
+  $("#finalTimer").knob({
+    'min': 0,
+    'max': game.time,
+    'readOnly': true,
+    'width': ~~(window.innerWidth  * 0.20),
+    'height': ~~(window.innerWidth * 0.20),
+    'fgColor': '#FFD700',
+    'bgColor': "rgba(0,0,0,0)",
+    'thickness': 0.1
+  });
+
+  $("#finalTimer").parent().addClass("finalTimer");
+  $("#finalTimer").val(game.time).trigger('change');
+  $("#finalTimer").on('click', function(e){
+    console.log('clicked')
+  })
+
+  var countdownInterval = setInterval(function(){
+    var newValue = $("#finalTimer").val() - 1;
+    if (newValue < 0) clearInterval(countdownInterval);
+    else $("#finalTimer").val(newValue).trigger('change');
+  }, 1000);
+
+  $("#finalTriviaTitle").html('<span>'+game.title+'</span>');
+  $("#finalTriviaQuestion").html('<span>'+game.question+'</span>');
+
+  sizeStaticElements();
 }
 
 
