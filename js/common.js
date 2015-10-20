@@ -4,7 +4,7 @@ $(function(){
   $.each(CONFIG.teams, function(i,v){ $('<div/>', {
       id: "score-"+i,
       "data-team": i,
-      "data-sizefactor": 0.8,
+      "data-sizefactor": 0.65,
       "class": "score autosize",
       style: "width:"+(100/CONFIG.teams.length)+"%",
       html: '<div class="name">'+v+'</div><span class="value">0</span>'
@@ -54,18 +54,16 @@ function showAudience(visible) {
   else $("#audience").fadeOut(CONFIG.transitionDuration);
 }
 
-function buildRebus(args){
-  var game = args[0];
-  var hidden = args[1];
-  var active_question = args[2];
-
+function buildRebus(game){
   $("#rebus").empty();
   $("section").fadeOut(CONFIG.transitionDuration);
   $('clearQuestion').hide();
   showAudience(false);
 
   for (var i = 0; i < CONFIG.rebusRow * CONFIG.rebusColumn; i++) {
-    $('<div/>', {
+    var col = i % CONFIG.rebusColumn;
+    var row = Math.floor(i / CONFIG.rebusColumn);
+    var a = $('<div/>', {
         id: "rebus-"+i,
         "data-block": i,
         "data-row": Math.floor(i / CONFIG.rebusColumn),
@@ -75,21 +73,22 @@ function buildRebus(args){
         "data-sizefactor": 0.5,
         style: "width:"+(100/CONFIG.rebusColumn)+"%;height:"+(100/CONFIG.rebusRow)+"%",
         html: "<span>"+(i+1)+"</span>"
-      }).appendTo("#rebus")
+      });
+    if(game.blocks[col][row].hidden !== undefined)
+    {
+      a.addClass('clear');
+    }
+    a.appendTo("#rebus");
   }
-
-  $.each(hidden, function(i, v) {
-    $('#'+v).addClass('clear');
-  });
 
   $("#rebus").css('background-image', "url('"+game.image+"')");
   $("#rebus").fadeIn(1500);
   $("#solution").html(game.solution);
   $("#correct, #incorrect, #solution, #clearRebus").show();
 
-  if(active_question !== undefined && active_question !== null) {
-    renderQuestion(active_question.question);
-    if($('#answerDisplay').length > 0) { renderAnswer(active_question.answer); } // Will only work on server
+  if(game.active_question !== undefined) {
+    renderQuestion(game.active_question.question);
+    if($('#answerDisplay').length > 0) { renderAnswer(game.active_question.answer); } // Will only work on server
   }
 }
 
@@ -101,11 +100,7 @@ function clearRebusBlock(block) {
   $("#rebus .rebusBlock").eq(block).addClass('clear');
 }
 
-function buildCategories(args){
-  var game = args[0];
-  var hidden = args[1];
-  var active_question = args[2];
-
+function buildCategories(game){
   $("section").fadeOut(CONFIG.transitionDuration);
   $("#categories").empty();
   showAudience(false);
@@ -128,8 +123,10 @@ function buildCategories(args){
           "data-sizefactor": .9
         }).appendTo("#"+containerName)
 
-    for (var idx = 0; idx < v.questions.length; ++idx)
-      $('<div/>', {
+    for (var idx = 0; idx < v.questions.length; ++idx) {
+      var col = i;
+      var row = idx;
+      var a = $('<div/>', {
             "id": "categories-"+i+"-"+idx,
             "class": "categoriesOption autosize",
             "data-column": i,
@@ -139,19 +136,22 @@ function buildCategories(args){
             "data-sizefactor": 0.35,
             style: "width:100%;height:"+(100/(v.questions.length+1))+"%",
             html: "<span>"+game.pointValues[idx]+"</span>"
-          }).appendTo("#"+containerName)
-  });
+          });
 
-  $.each(hidden, function(i, v) {
-    $('#'+v).addClass('clear');
+      if(game.blocks[col][row].hidden !== undefined)
+      {
+        a.addClass('clear');
+      }
+      a.appendTo("#"+containerName);
+    }
   });
 
   $("#correct, #incorrect, #clearQuestion").show();
   $('#categories').fadeIn(CONFIG.transitionDuration);
 
-  if(active_question !== undefined && active_question !== null) {
-    renderQuestion(active_question.question);
-    if($('#answerDisplay').length > 0) { renderAnswer(active_question.answer); } // Will only work on server
+  if(game.active_question !== undefined) {
+    renderQuestion(game.active_question.question);
+    if($('#answerDisplay').length > 0) { renderAnswer(game.active_question.answer); } // Will only work on server
   }
 }
 

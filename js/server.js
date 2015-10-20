@@ -9,27 +9,23 @@ var GameState = (function() {
   var _ROUND;
   var _TEAM;
   var _POINTS;
-  var _HIDDEN;
-  var _ACTIVE_QUESTION;
+  var _GAMES;
   var _QUESTIONS;
   var _INDEX;
   var _DOUBLE;
   var _BID; // Double Points
   var _WAGERS; // Final Trivia
-  var RESIST_RESET = false;
 
-  function GameState(reload) {
+  function GameState(games, reload) {
 
     // Load previous game state from localstorage
     //if (confirm("Do you want to use existing game state?")) {
     if (reload && STORAGE_VALID) {
       console.log('[INFO] Restoring existing game state')
-      RESIST_RESET = true;
       _POINTS = JSON.parse(localStorage.points);
       _TEAM = JSON.parse(localStorage.team);
       _ROUND = JSON.parse(localStorage.round);
-      _HIDDEN = JSON.parse(localStorage.hidden);
-      _ACTIVE_QUESTION = JSON.parse(localStorage.active_question);
+      _GAMES = JSON.parse(localStorage.games);
       _QUESTIONS = JSON.parse(localStorage.questions);
       _INDEX = JSON.parse(localStorage.index);
       _DOUBLE = JSON.parse(localStorage.double);
@@ -41,8 +37,7 @@ var GameState = (function() {
       _POINTS = Array(CONFIG.teams.length).fill(0);
       _TEAM = 0;
       _ROUND = 0;
-      _HIDDEN = [];
-      _ACTIVE_QUESTION = null;
+      _GAMES = $.extend(true, {}, games);
       _QUESTIONS = null;
       _INDEX = -1;
       _DOUBLE = -1;
@@ -51,8 +46,7 @@ var GameState = (function() {
       localStorage.points = JSON.stringify(_POINTS);
       localStorage.team = JSON.stringify(_TEAM);
       localStorage.round = JSON.stringify(_ROUND);
-      localStorage.hidden = JSON.stringify(_HIDDEN);
-      localStorage.active_question = JSON.stringify(_ACTIVE_QUESTION);
+      localStorage.games = JSON.stringify(_GAMES);
       localStorage.questions = JSON.stringify(_QUESTIONS);
       localStorage.index = JSON.stringify(_INDEX);
       localStorage.double = JSON.stringify(_DOUBLE);
@@ -64,8 +58,7 @@ var GameState = (function() {
   GameState.prototype.getTeam = function() { return _TEAM; };
   GameState.prototype.getRound = function() { return _ROUND; };
   GameState.prototype.getPoints = function() { return _POINTS; };
-  GameState.prototype.getHidden = function() { return _HIDDEN; };
-  GameState.prototype.getActiveQuestion = function() { return _ACTIVE_QUESTION; };
+  GameState.prototype.getGames = function() { return _GAMES; };
   GameState.prototype.getQuestions = function() { return _QUESTIONS; };
   GameState.prototype.getQuestionIndex = function() { return _INDEX; };
   GameState.prototype.getDoublePointsIndex = function() { return _DOUBLE; };
@@ -75,39 +68,44 @@ var GameState = (function() {
   GameState.prototype.setTeam = function(team) { _TEAM = team; localStorage.team = JSON.stringify(_TEAM); };
   GameState.prototype.setRound = function(round) { _ROUND = round; localStorage.round = JSON.stringify(_ROUND); };
   GameState.prototype.setPoints = function(points) { _POINTS = points; localStorage.points = JSON.stringify(_POINTS); };
-  GameState.prototype.setHidden = function(hidden) { _HIDDEN = hidden; localStorage.hidden = JSON.stringify(_HIDDEN); };
-  GameState.prototype.setActiveQuestion = function(active_question) { _ACTIVE_QUESTION = active_question; localStorage.active_question = JSON.stringify(_ACTIVE_QUESTION); };
+  GameState.prototype.setGames = function(games) { _GAMES = games; localStorage.games = JSON.stringify(_GAMES); };
   GameState.prototype.setQuestions = function(questions) { _QUESTIONS = questions; localStorage.questions = JSON.stringify(_QUESTIONS); };
   GameState.prototype.setQuestionIndex = function(index) { _INDEX = index; localStorage.index = JSON.stringify(_INDEX); };
   GameState.prototype.setDoublePointsIndex = function(double) { _DOUBLE = double; localStorage.double = JSON.stringify(_DOUBLE); };
   GameState.prototype.setDoublePointsBid = function(bid) { _BID = bid; localStorage.bid = JSON.stringify(_BID); };
   GameState.prototype.setWagers = function(wagers) { _WAGERS = wagers; localStorage.wagers = JSON.stringify(_WAGERS); };
 
-  GameState.prototype.hideBlock = function(id) {
-    _HIDDEN.push(id);
-    this.setHidden(_HIDDEN);
+  GameState.prototype.hideBlock = function(col, row) {
+    _ACTIVE_GAME.blocks[col][row].hidden = true;
+    delete _ACTIVE_GAME.active_question;
+    this.setGames(_GAMES); // Pass by reference will include changes
   };
 
-  GameState.prototype.prepareBoard = function(game) {
-    if(RESIST_RESET) {
-      RESIST_RESET = false;
-      return;
-    }
+  GameState.prototype.hideQuestion = function() {
+    delete _ACTIVE_GAME.active_question;
+  }
 
-    if(game.type == "rebus")
+  GameState.prototype.getGame = function(index) {
+    return _GAMES[index];
+  }
+
+  GameState.prototype.prepareGame = function(index) {
+    _ACTIVE_GAME = _GAMES[index];
+
+    if(_ACTIVE_GAME.type == "rebus")
     {
-      this.setHidden([]);
-      this.setQuestions(game.questions);
+      this.setQuestions(_ACTIVE_GAME.questions);
       this.setTeam(losingTeam());
     }
-    else if(game.type == "categories")
+    else if(_ACTIVE_GAME.type == "categories")
     {
-      this.setHidden([]);
-      this.setQuestions(game.board);
+      this.setQuestions(_ACTIVE_GAME.board);
       this.setQuestionIndex(-1);
       this.setTeam(-1);
-      this.setDoublePointsIndex(Math.floor(Math.random() * (game.board.length * game.pointValues.length)));
+      this.setDoublePointsIndex(Math.floor(Math.random() * (_ACTIVE_GAME.board.length * _ACTIVE_GAME.pointValues.length)));
     }
+
+    return _ACTIVE_GAME;
   }
 
   GameState.prototype.getNewQuestion = function(categoryIndex) {
@@ -117,11 +115,12 @@ var GameState = (function() {
       gameState.setQuestionIndex(gameState.getQuestionIndex()+1);
     }
     var i = Math.floor(Math.random() * questions.length);
-    this.setActiveQuestion(questions[i]);
+    _ACTIVE_GAME.active_question = $.extend(true, {}, questions[i]);
     questions.splice(i,1);
     this.setQuestions(_QUESTIONS);
+    this.setGames(_GAMES); // Pass by reference will include changes
 
-    return _ACTIVE_QUESTION;
+    return _ACTIVE_GAME.active_question;
   };
 
   GameState.prototype.updatePoints = function(team, delta) {
@@ -150,11 +149,12 @@ function sendCommand(cmd, data) {
   clientScreen.postMessage({cmd: cmd, content: data}, "*")
 }
 
-function runGame(game) {
+function runGame(index) {
+  var game = gameState.getGame(index);
 
   if (game.type == 'rebus') {
-    gameState.prepareBoard(game);
-    sendCommand('buildRebus', [game, gameState.getHidden(), gameState.getActiveQuestion()]);
+    game = gameState.prepareGame(index);
+    sendCommand('buildRebus', game);
     if(game.points > 0) {
       sendCommand('showScores', true);
     }
@@ -166,8 +166,8 @@ function runGame(game) {
   }
 
   else if (game.type == 'categories') {
-    gameState.prepareBoard(game);
-    sendCommand('buildCategories', [game, gameState.getHidden(), gameState.getActiveQuestion()]);
+    game = gameState.prepareGame(index);
+    sendCommand('buildCategories', game);
     sendCommand('showScores', true);
     sendCommand('sizeStaticElements');
   }
@@ -200,7 +200,7 @@ var CAN_SCORE = false;
 var doublePointsSound = new Audio('assets/DoublePoints.m4a');
 
 function initialize() {
-  gameState = new GameState(true);
+  gameState = new GameState(GAMES, true);
 
   $.each(GAMES, function(i,v){ $('<option/>', {
       value: i,
@@ -236,10 +236,10 @@ function correct() {
   if (!CAN_SCORE) return;
   var game = GAMES[gameState.getRound()];
   sendCommand('hideQuestion');
-  gameState.setActiveQuestion(null);
+  gameState.hideQuestion();
 
   if (game.type == "rebus") {
-    gameState.hideBlock(ACTIVE_CELL.attr('id'));
+    gameState.hideBlock(ACTIVE_CELL.data('column'), ACTIVE_CELL.data('row'));
     sendCommand('clearRebusBlock', ACTIVE_CELL.data('block'));
     updatePoints(gameState.getTeam(), game.points);
     //nextTeam();
@@ -249,7 +249,7 @@ function correct() {
     if (gameState.getQuestionIndex() == gameState.getDoublePointsIndex()) {
       pts = gameState.getDoublePointsBid();
     }
-    gameState.hideBlock(ACTIVE_CELL.attr('id'));
+    gameState.hideBlock(ACTIVE_CELL.data('column'), ACTIVE_CELL.data('row'));
     sendCommand('clearCategoriesBlock', [ACTIVE_CELL.data('column'), ACTIVE_CELL.data('row')]);
     updatePoints(gameState.getTeam(), pts);
     gameState.setTeam(-1);
@@ -265,7 +265,7 @@ function incorrect() {
 
   if (game.type == "rebus") {
     sendCommand('hideQuestion');
-    gameState.setActiveQuestion(null);
+    gameState.hideQuestion();
     ACTIVE_CELL = null;
     nextTeam();
   }
@@ -335,9 +335,9 @@ $(function() {
 
     $('#clearQuestion').on('click', function(e) {
       sendCommand('hideQuestion');
-      gameState.hideBlock(ACTIVE_CELL.attr('id'));
+      gameState.hideBlock(ACTIVE_CELL.data('column'), ACTIVE_CELL.data('row'));
       sendCommand('clearCategoriesBlock', [ACTIVE_CELL.data('column'), ACTIVE_CELL.data('row')]);
-      gameState.setActiveQuestion(null);
+      gameState.hideQuestion();
       ACTIVE_CELL = null;
     });
 
@@ -416,13 +416,7 @@ $(function() {
     $("#incorrect").on("click", incorrect);
 
     $("#rebus").on("click", '.rebusBlock', function(e) {
-      var question;
-      if(gameState.getActiveQuestion() !== null) {
-        question = gameState.getActiveQuestion();
-      }
-      else {
-        question = gameState.getNewQuestion();
-      }
+      var question = gameState.getNewQuestion();
       CAN_SCORE = true;
       ACTIVE_CELL = $(this);
       sendCommand('renderQuestion', question.question);
@@ -432,13 +426,7 @@ $(function() {
     $("#categories").on("click", '.categoriesOption', function(e) {
       if(gameState.getTeam() >= 0) { CAN_SCORE = true; }
       var game = GAMES[gameState.getRound()];
-      var question;
-      if(gameState.getActiveQuestion() !== null) {
-        question = gameState.getActiveQuestion();
-      }
-      else {
-        question = gameState.getNewQuestion($(this).data('column'));
-      }
+      var question = gameState.getNewQuestion($(this).data('column'));
       if (gameState.getQuestionIndex() == gameState.getDoublePointsIndex()) {
         sendCommand('doublePoints', true);
         doublePointsSound.play();
@@ -460,11 +448,11 @@ $(function() {
 
     $("#rounds").on("change", function(e){
       closeModal();
-      gameState.setRound(parseInt($(this).val()));
-      runGame(GAMES[parseInt($(this).val())]);
-      gameState.setQuestionIndex(0);
+      var i = parseInt($(this).val());
+      gameState.setRound(i);
+      runGame(i);
       sendCommand('highlightTeam', gameState.getTeam());
-      if(GAMES[parseInt($(this).val())+1] === undefined) { $('#next-round').hide(); }
+      if(gameState.getGame(i+1) === undefined) { $('#next-round').hide(); }
     });
 
     $('#next-round').on("click", function(e) {
