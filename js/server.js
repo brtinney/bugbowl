@@ -75,18 +75,23 @@ var GameState = (function() {
   GameState.prototype.setDoublePointsBid = function(bid) { _BID = bid; localStorage.bid = JSON.stringify(_BID); };
   GameState.prototype.setWagers = function(wagers) { _WAGERS = wagers; localStorage.wagers = JSON.stringify(_WAGERS); };
 
-  GameState.prototype.hideBlock = function(col, row) {
-    _ACTIVE_GAME.blocks[col][row].hidden = true;
-    delete _ACTIVE_GAME.active_question;
+  GameState.prototype.hideBlock = function() {
+    _ACTIVE_GAME.blocks[_ACTIVE_GAME.active_cell.column][_ACTIVE_GAME.active_cell.row].hidden = true;
+    this.hideQuestion();
     this.setGames(_GAMES); // Pass by reference will include changes
   };
 
   GameState.prototype.hideQuestion = function() {
     delete _ACTIVE_GAME.active_question;
+    delete _ACTIVE_GAME.active_cell;
   }
 
   GameState.prototype.getGame = function(index) {
     return _GAMES[index];
+  }
+
+  GameState.prototype.getActiveCell = function() {
+    return _ACTIVE_GAME.active_cell;
   }
 
   GameState.prototype.prepareGame = function(index) {
@@ -108,7 +113,7 @@ var GameState = (function() {
     return _ACTIVE_GAME;
   }
 
-  GameState.prototype.getNewQuestion = function(categoryIndex) {
+  GameState.prototype.getNewQuestion = function(block, categoryIndex) {
     var questions = this.getQuestions();
     if (categoryIndex !== undefined) {
       questions = questions[categoryIndex].questions;
@@ -118,6 +123,8 @@ var GameState = (function() {
     _ACTIVE_GAME.active_question = $.extend(true, {}, questions[i]);
     questions.splice(i,1);
     this.setQuestions(_QUESTIONS);
+    _ACTIVE_GAME.active_cell = {'column': block.data('column'), 'row': block.data('row'), 'points': block.data('points'), 'block': block.data('block')};
+
     this.setGames(_GAMES); // Pass by reference will include changes
 
     return _ACTIVE_GAME.active_question;
@@ -236,26 +243,29 @@ function correct() {
   if (!CAN_SCORE) return;
   var game = GAMES[gameState.getRound()];
   sendCommand('hideQuestion');
-  gameState.hideQuestion();
+
 
   if (game.type == "rebus") {
-    gameState.hideBlock(ACTIVE_CELL.data('column'), ACTIVE_CELL.data('row'));
-    sendCommand('clearRebusBlock', ACTIVE_CELL.data('block'));
+    var cell = gameState.getActiveCell();
+    gameState.hideBlock();
+    sendCommand('clearRebusBlock', cell.block);
     updatePoints(gameState.getTeam(), game.points);
     //nextTeam();
   }
   else if (game.type == "categories") {
-    var pts = ACTIVE_CELL.data('points');
+    var cell = gameState.getActiveCell();
+    var pts = gameState.getActiveCell().points;
     if (gameState.getQuestionIndex() == gameState.getDoublePointsIndex()) {
       pts = gameState.getDoublePointsBid();
     }
-    gameState.hideBlock(ACTIVE_CELL.data('column'), ACTIVE_CELL.data('row'));
-    sendCommand('clearCategoriesBlock', [ACTIVE_CELL.data('column'), ACTIVE_CELL.data('row')]);
+    gameState.hideBlock();
+    sendCommand('clearCategoriesBlock', [cell.column, cell.row]);
     updatePoints(gameState.getTeam(), pts);
     gameState.setTeam(-1);
     sendCommand('highlightTeam', -1);
   }
-  ACTIVE_CELL = null;
+
+  gameState.hideQuestion();
   CAN_SCORE = false;
 }
 
@@ -266,11 +276,10 @@ function incorrect() {
   if (game.type == "rebus") {
     sendCommand('hideQuestion');
     gameState.hideQuestion();
-    ACTIVE_CELL = null;
     nextTeam();
   }
   else if (game.type == "categories") {
-    var pts = ACTIVE_CELL.data('points');
+    var pts = gameState.getActiveCell().points;
     if (gameState.getQuestionIndex() == gameState.getDoublePointsIndex()) {
       pts = gameState.getDoublePointsBid();
     }
@@ -334,11 +343,11 @@ $(function() {
     });
 
     $('#clearQuestion').on('click', function(e) {
+      var cell = gameState.getActiveCell();
       sendCommand('hideQuestion');
-      gameState.hideBlock(ACTIVE_CELL.data('column'), ACTIVE_CELL.data('row'));
-      sendCommand('clearCategoriesBlock', [ACTIVE_CELL.data('column'), ACTIVE_CELL.data('row')]);
+      gameState.hideBlock();
+      sendCommand('clearCategoriesBlock', [cell.column, cell.row]);
       gameState.hideQuestion();
-      ACTIVE_CELL = null;
     });
 
     $('#wager button').on('click', function(e) {
@@ -360,7 +369,7 @@ $(function() {
       if (team >= 0 && team < CONFIG.teams.length) {
         gameState.setTeam(team);
         sendCommand('highlightTeam', gameState.getTeam());
-        if(ACTIVE_CELL !== undefined && ACTIVE_CELL !== null) { CAN_SCORE = true; }
+        if(gameState.getActiveCell() !== undefined) { CAN_SCORE = true; }
       }
 
       if (e.keyCode == 77) { // m
@@ -374,7 +383,7 @@ $(function() {
 
       if (e.keyCode == 78) { // n
         nextTeam();
-        if(ACTIVE_CELL !== undefined && ACTIVE_CELL !== null) { CAN_SCORE = true; }
+        if(gameState.getActiveCell() !== undefined) { CAN_SCORE = true; }
       }
 
       // Incorrect answer (Escape)
@@ -396,7 +405,7 @@ $(function() {
     // Team Selection (via mouse)
     $("#scores").on("click", ".score", function(e){
       gameState.setTeam(parseInt($(this).data('team')));
-      if(ACTIVE_CELL !== undefined && ACTIVE_CELL !== null) { CAN_SCORE = true; }
+      if(gameState.getActiveCell() !== undefined) { CAN_SCORE = true; }
       sendCommand('highlightTeam', gameState.getTeam());
     });
 
@@ -410,15 +419,12 @@ $(function() {
    });
    */
 
-    //$("#correct").on("click", function(e){ sendCommand('clearRebusBlock', ACTIVE_CELL); });
-    //$("#incorrect").on("click", function(e){ sendCommand('rebusIncorrect'); });
     $("#correct").on("click", correct);
     $("#incorrect").on("click", incorrect);
 
     $("#rebus").on("click", '.rebusBlock', function(e) {
-      var question = gameState.getNewQuestion();
+      var question = gameState.getNewQuestion($(this));
       CAN_SCORE = true;
-      ACTIVE_CELL = $(this);
       sendCommand('renderQuestion', question.question);
       renderAnswer(question.answer);
     });
@@ -426,7 +432,7 @@ $(function() {
     $("#categories").on("click", '.categoriesOption', function(e) {
       if(gameState.getTeam() >= 0) { CAN_SCORE = true; }
       var game = GAMES[gameState.getRound()];
-      var question = gameState.getNewQuestion($(this).data('column'));
+      var question = gameState.getNewQuestion($(this), $(this).data('column'));
       if (gameState.getQuestionIndex() == gameState.getDoublePointsIndex()) {
         sendCommand('doublePoints', true);
         doublePointsSound.play();
@@ -435,7 +441,6 @@ $(function() {
       else {
         $('#wager').hide();
       }
-      ACTIVE_CELL = $(this);
 
       sendCommand('renderQuestion', question.question);
       renderAnswer(question.answer);

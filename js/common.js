@@ -87,6 +87,7 @@ function buildRebus(game){
   $("#correct, #incorrect, #solution, #clearRebus").show();
 
   if(game.active_question !== undefined) {
+    CAN_SCORE = true;
     renderQuestion(game.active_question.question);
     if($('#answerDisplay').length > 0) { renderAnswer(game.active_question.answer); } // Will only work on server
   }
