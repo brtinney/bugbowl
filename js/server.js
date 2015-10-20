@@ -9,13 +9,14 @@ var GameState = (function() {
   var _ROUND;
   var _TEAM;
   var _POINTS;
-  var _BOARD;
+  var _HIDDEN;
   var _ACTIVE_QUESTION;
   var _QUESTIONS;
   var _INDEX;
   var _DOUBLE;
   var _BID; // Double Points
   var _WAGERS; // Final Trivia
+  var RESIST_RESET = false;
 
   function GameState(reload) {
 
@@ -23,10 +24,11 @@ var GameState = (function() {
     //if (confirm("Do you want to use existing game state?")) {
     if (reload && STORAGE_VALID) {
       console.log('[INFO] Restoring existing game state')
+      RESIST_RESET = true;
       _POINTS = JSON.parse(localStorage.points);
       _TEAM = JSON.parse(localStorage.team);
       _ROUND = JSON.parse(localStorage.round);
-      _BOARD = JSON.parse(localStorage.board);
+      _HIDDEN = JSON.parse(localStorage.hidden);
       _ACTIVE_QUESTION = JSON.parse(localStorage.active_question);
       _QUESTIONS = JSON.parse(localStorage.questions);
       _INDEX = JSON.parse(localStorage.index);
@@ -39,7 +41,7 @@ var GameState = (function() {
       _POINTS = Array(CONFIG.teams.length).fill(0);
       _TEAM = 0;
       _ROUND = 0;
-      _BOARD = null;
+      _HIDDEN = [];
       _ACTIVE_QUESTION = null;
       _QUESTIONS = null;
       _INDEX = -1;
@@ -49,7 +51,7 @@ var GameState = (function() {
       localStorage.points = JSON.stringify(_POINTS);
       localStorage.team = JSON.stringify(_TEAM);
       localStorage.round = JSON.stringify(_ROUND);
-      localStorage.board = JSON.stringify(_BOARD);
+      localStorage.hidden = JSON.stringify(_HIDDEN);
       localStorage.active_question = JSON.stringify(_ACTIVE_QUESTION);
       localStorage.questions = JSON.stringify(_QUESTIONS);
       localStorage.index = JSON.stringify(_INDEX);
@@ -62,7 +64,7 @@ var GameState = (function() {
   GameState.prototype.getTeam = function() { return _TEAM; };
   GameState.prototype.getRound = function() { return _ROUND; };
   GameState.prototype.getPoints = function() { return _POINTS; };
-  GameState.prototype.getBoard = function() { return _BOARD; };
+  GameState.prototype.getHidden = function() { return _HIDDEN; };
   GameState.prototype.getActiveQuestion = function() { return _ACTIVE_QUESTION; };
   GameState.prototype.getQuestions = function() { return _QUESTIONS; };
   GameState.prototype.getQuestionIndex = function() { return _INDEX; };
@@ -73,7 +75,7 @@ var GameState = (function() {
   GameState.prototype.setTeam = function(team) { _TEAM = team; localStorage.team = JSON.stringify(_TEAM); };
   GameState.prototype.setRound = function(round) { _ROUND = round; localStorage.round = JSON.stringify(_ROUND); };
   GameState.prototype.setPoints = function(points) { _POINTS = points; localStorage.points = JSON.stringify(_POINTS); };
-  GameState.prototype.setBoard = function(board) { _BOARD = board; localStorage.board = JSON.stringify(_BOARD); };
+  GameState.prototype.setHidden = function(hidden) { _HIDDEN = hidden; localStorage.hidden = JSON.stringify(_HIDDEN); };
   GameState.prototype.setActiveQuestion = function(active_question) { _ACTIVE_QUESTION = active_question; localStorage.active_question = JSON.stringify(_ACTIVE_QUESTION); };
   GameState.prototype.setQuestions = function(questions) { _QUESTIONS = questions; localStorage.questions = JSON.stringify(_QUESTIONS); };
   GameState.prototype.setQuestionIndex = function(index) { _INDEX = index; localStorage.index = JSON.stringify(_INDEX); };
@@ -81,10 +83,32 @@ var GameState = (function() {
   GameState.prototype.setDoublePointsBid = function(bid) { _BID = bid; localStorage.bid = JSON.stringify(_BID); };
   GameState.prototype.setWagers = function(wagers) { _WAGERS = wagers; localStorage.wagers = JSON.stringify(_WAGERS); };
 
-  GameState.prototype.removeBlock = function(col, row) {
-    _BOARD[col][row].hidden = true;
-    this.setBoard(_BOARD);
+  GameState.prototype.hideBlock = function(id) {
+    _HIDDEN.push(id);
+    this.setHidden(_HIDDEN);
   };
+
+  GameState.prototype.prepareBoard = function(game) {
+    if(RESIST_RESET) {
+      RESIST_RESET = false;
+      return;
+    }
+
+    if(game.type == "rebus")
+    {
+      this.setHidden([]);
+      this.setQuestions(game.questions);
+      this.setTeam(losingTeam());
+    }
+    else if(game.type == "categories")
+    {
+      this.setHidden([]);
+      this.setQuestions(game.board);
+      this.setQuestionIndex(-1);
+      this.setTeam(-1);
+      this.setDoublePointsIndex(Math.floor(Math.random() * (game.board.length * game.pointValues.length)));
+    }
+  }
 
   GameState.prototype.getNewQuestion = function(categoryIndex) {
     var questions = this.getQuestions();
@@ -129,9 +153,8 @@ function sendCommand(cmd, data) {
 function runGame(game) {
 
   if (game.type == 'rebus') {
-    gameState.setBoard(Array(CONFIG.rebusColumn).fill(Array(CONFIG.rebusRow).fill({})));
-    gameState.setQuestions(game.questions);
-    sendCommand('buildRebus', game);
+    gameState.prepareBoard(game);
+    sendCommand('buildRebus', [game, gameState.getHidden(), gameState.getActiveQuestion()]);
     if(game.points > 0) {
       sendCommand('showScores', true);
     }
@@ -143,11 +166,8 @@ function runGame(game) {
   }
 
   else if (game.type == 'categories') {
-    gameState.setBoard(Array(game.board.length).fill(Array(game.pointValues.length).fill({})));
-    gameState.setQuestions(game.board);
-    gameState.setQuestionIndex(-1);
-    gameState.setDoublePointsIndex(Math.floor(Math.random() * (game.board.length * game.pointValues.length)));
-    sendCommand('buildCategories', game);
+    gameState.prepareBoard(game);
+    sendCommand('buildCategories', [game, gameState.getHidden(), gameState.getActiveQuestion()]);
     sendCommand('showScores', true);
     sendCommand('sizeStaticElements');
   }
@@ -177,7 +197,7 @@ if (!clientScreen) alert("ERROR: Pop-up blocker seems to be enabled. Please allo
 //window.onunload = window.onbeforeunload = function() { clientScreen.close(); }
 var gameState;
 var CAN_SCORE = false;
-
+var doublePointsSound = new Audio('assets/DoublePoints.m4a');
 
 function initialize() {
   gameState = new GameState(true);
@@ -219,7 +239,7 @@ function correct() {
   gameState.setActiveQuestion(null);
 
   if (game.type == "rebus") {
-    gameState.removeBlock(ACTIVE_CELL.data('column'), ACTIVE_CELL.data('row'));
+    gameState.hideBlock(ACTIVE_CELL.attr('id'));
     sendCommand('clearRebusBlock', ACTIVE_CELL.data('block'));
     updatePoints(gameState.getTeam(), game.points);
     //nextTeam();
@@ -229,7 +249,7 @@ function correct() {
     if (gameState.getQuestionIndex() == gameState.getDoublePointsIndex()) {
       pts = gameState.getDoublePointsBid();
     }
-    gameState.removeBlock(ACTIVE_CELL.data('column'), ACTIVE_CELL.data('row'));
+    gameState.hideBlock(ACTIVE_CELL.attr('id'));
     sendCommand('clearCategoriesBlock', [ACTIVE_CELL.data('column'), ACTIVE_CELL.data('row')]);
     updatePoints(gameState.getTeam(), pts);
     gameState.setTeam(-1);
@@ -274,7 +294,7 @@ function losingTeam() {
     }
   }
 
-  return losing;
+  return parseInt(losing);
 }
 
 function nextTeam() {
@@ -315,7 +335,7 @@ $(function() {
 
     $('#clearQuestion').on('click', function(e) {
       sendCommand('hideQuestion');
-      gameState.removeBlock(ACTIVE_CELL.data('column'), ACTIVE_CELL.data('row'));
+      gameState.hideBlock(ACTIVE_CELL.attr('id'));
       sendCommand('clearCategoriesBlock', [ACTIVE_CELL.data('column'), ACTIVE_CELL.data('row')]);
       gameState.setActiveQuestion(null);
       ACTIVE_CELL = null;
@@ -375,7 +395,8 @@ $(function() {
 
     // Team Selection (via mouse)
     $("#scores").on("click", ".score", function(e){
-      gameState.setTeam($(this).data('team'));
+      gameState.setTeam(parseInt($(this).data('team')));
+      if(ACTIVE_CELL !== undefined && ACTIVE_CELL !== null) { CAN_SCORE = true; }
       sendCommand('highlightTeam', gameState.getTeam());
     });
 
@@ -420,6 +441,7 @@ $(function() {
       }
       if (gameState.getQuestionIndex() == gameState.getDoublePointsIndex()) {
         sendCommand('doublePoints', true);
+        doublePointsSound.play();
         $('#wager').show();
       }
       else {
@@ -441,8 +463,8 @@ $(function() {
       gameState.setRound(parseInt($(this).val()));
       runGame(GAMES[parseInt($(this).val())]);
       gameState.setQuestionIndex(0);
-      gameState.setTeam(losingTeam());
       sendCommand('highlightTeam', gameState.getTeam());
+      if(GAMES[parseInt($(this).val())+1] === undefined) { $('#next-round').hide(); }
     });
 
     $('#next-round').on("click", function(e) {

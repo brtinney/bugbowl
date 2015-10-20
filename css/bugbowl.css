@@ -27,8 +27,6 @@ body {
 	top: 0%;
 	height:12%;
 	display:none;
-	border-bottom: 2px solid #000;
-	/*border: 10px solid #BE8B4A;*/
 }
 #audience {
 	width: 100%;
@@ -39,13 +37,11 @@ body {
 	/*border: 10px solid #BE8B4A;*/
 	text-align: center;
 	color: #BE8B4A;
-	border-bottom: 2px solid #000;
 }
 #scores .score {
 	text-align: center;
-	display: inline-block;
+	float: left;
 	height: 100%;
-	padding: 10px 0;
 	cursor:pointer;
 	position: relative;
 	transition: background 350ms, color 350ms, font-weight 350ms, visibility 350ms ;
@@ -99,6 +95,15 @@ body {
 	left:0;
 	width: 100%;
 	padding: 0;
+}
+#controls button {
+	cursor: pointer;
+}
+#correct {
+	color: #191;
+}
+#incorrect {
+	color: #911;
 }
 #questionShell {
 	position:fixed;
@@ -165,7 +170,7 @@ body {
 .rebusBlock {
 	float:left;
 	text-align: center;
-	background: linear-gradient(to bottom, #81C3D5 0%,#258BA9 41%,#258BA9 100%);
+	background: linear-gradient(to bottom, #2897B8 0%,#1C6B82 41%,#1C6B82 100%);
 	cursor: pointer;
 	box-sizing: border-box;
 	border:1px solid #FFF;
@@ -224,6 +229,7 @@ body {
 	font-weight: bold;
 	border-bottom:3px solid #FFF;
 	border-left: 1px solid #FFF;
+	border-top: 2px solid #FFF;
 }
 #categoriesColumn-0 .categoriesHeader {
 	border-left: none;
@@ -231,7 +237,7 @@ body {
 .categoriesOption {
 	color:#FFF;
 	text-align: center;
-	background: linear-gradient(to bottom, #81C3D5 0%,#258BA9 41%,#258BA9 100%);
+	background: linear-gradient(to bottom, #2897B8 0%,#1C6B82 41%,#1C6B82 100%);
 	cursor: pointer;
 	box-sizing: border-box;
 	border:1px solid #FFF;
@@ -245,9 +251,12 @@ body {
 	visibility: hidden;
 }
 #next-round {
-	font-size: 180%;
+	font-size: 400%;
 	cursor: pointer;
 	color: #BE8B4A;
+	position: absolute;
+	bottom: 16px;
+	right: 16px;
 }
 #wager {
 	position: absolute;

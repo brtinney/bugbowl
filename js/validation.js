@@ -37,7 +37,7 @@ $(function(){
   }
 
   function validateStoredState() {
-    var vars = ['points', 'team', 'round', 'board', 'active_question', 'questions', 'index', 'double', 'bid', 'wagers'];
+    var vars = ['points', 'team', 'round', 'hidden', 'active_question', 'questions', 'index', 'double', 'bid', 'wagers'];
     var valid = true;
     for (var i in vars) {
       if (localStorage.length && !localStorage[vars[i]]) {

@@ -54,7 +54,11 @@ function showAudience(visible) {
   else $("#audience").fadeOut(CONFIG.transitionDuration);
 }
 
-function buildRebus(game){
+function buildRebus(args){
+  var game = args[0];
+  var hidden = args[1];
+  var active_question = args[2];
+
   $("#rebus").empty();
   $("section").fadeOut(CONFIG.transitionDuration);
   $('clearQuestion').hide();
@@ -73,10 +77,20 @@ function buildRebus(game){
         html: "<span>"+(i+1)+"</span>"
       }).appendTo("#rebus")
   }
+
+  $.each(hidden, function(i, v) {
+    $('#'+v).addClass('clear');
+  });
+
   $("#rebus").css('background-image', "url('"+game.image+"')");
   $("#rebus").fadeIn(1500);
   $("#solution").html(game.solution);
-  $("#correct, #incorrect, #solution, #clearRebus").show()
+  $("#correct, #incorrect, #solution, #clearRebus").show();
+
+  if(active_question !== undefined && active_question !== null) {
+    renderQuestion(active_question.question);
+    if($('#answerDisplay').length > 0) { renderAnswer(active_question.answer); } // Will only work on server
+  }
 }
 
 function clearRebus(){
@@ -87,7 +101,11 @@ function clearRebusBlock(block) {
   $("#rebus .rebusBlock").eq(block).addClass('clear');
 }
 
-function buildCategories(game){
+function buildCategories(args){
+  var game = args[0];
+  var hidden = args[1];
+  var active_question = args[2];
+
   $("section").fadeOut(CONFIG.transitionDuration);
   $("#categories").empty();
   showAudience(false);
@@ -112,6 +130,7 @@ function buildCategories(game){
 
     for (var idx = 0; idx < v.questions.length; ++idx)
       $('<div/>', {
+            "id": "categories-"+i+"-"+idx,
             "class": "categoriesOption autosize",
             "data-column": i,
             "data-row": idx,
@@ -121,10 +140,19 @@ function buildCategories(game){
             style: "width:100%;height:"+(100/(v.questions.length+1))+"%",
             html: "<span>"+game.pointValues[idx]+"</span>"
           }).appendTo("#"+containerName)
-  })
+  });
+
+  $.each(hidden, function(i, v) {
+    $('#'+v).addClass('clear');
+  });
 
   $("#correct, #incorrect, #clearQuestion").show();
   $('#categories').fadeIn(CONFIG.transitionDuration);
+
+  if(active_question !== undefined && active_question !== null) {
+    renderQuestion(active_question.question);
+    if($('#answerDisplay').length > 0) { renderAnswer(active_question.answer); } // Will only work on server
+  }
 }
 
 function clearCategoriesBlock(arr) {
