@@ -105,6 +105,9 @@ body {
 #incorrect {
 	color: #911;
 }
+#timesup {
+	color: #119;
+}
 #questionShell {
 	position:fixed;
 	top:12%;
@@ -189,6 +192,21 @@ body {
 	color: #F4D28A;
 	display: none;
 }
+#timeout {
+	display: none;
+	position: absolute;
+	right: 80px;
+	bottom: 12px;
+	cursor: pointer;
+}
+.clearfix:after {
+	visibility: hidden;
+	display: block;
+	font-size: 0;
+	content: " ";
+	clear: both;
+	height: 0;
+	}
 #intermission {
 	display:none;
 	position:absolute;
