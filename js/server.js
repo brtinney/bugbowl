@@ -184,7 +184,7 @@ function runGame(index) {
   }
 
   else if (game.type == 'final_trivia') {
-    sendCommand('showFinalTrivia', game)
+    sendCommand('buildFinalTrivia', game)
   }
 
   else if (game.type == 'closing') {
@@ -478,5 +478,17 @@ $(function() {
       });
       sendCommand('updateScores', gameState.getPoints());
       closeModal();
+    });
+
+    // ====================
+    // FINAL TRIVIA
+    // ====================
+
+    $("#revealTrivia").on("click", function(e){ sendCommand('revealFinalTrivia'); });
+
+    $("#startFinalTimer").on("click", function(e){
+      sendCommand('beginFinalTriviaTimer');
+      var finalSong = new Audio("assets/FinalCowbell.mp3");
+      finalSong.play();
     });
 });

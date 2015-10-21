@@ -201,10 +201,18 @@ function showIntermission(game) {
 }
 
 
-function showFinalTrivia(game){
+function buildFinalTrivia(game){
+
+  // Update section display
   $("section").fadeOut(CONFIG.transitionDuration);
   $("#finalTrivia").fadeIn(CONFIG.transitionDuration);
 
+  // Update controls
+  $("#controls button").hide();
+  $("#startFinalTimer, #openMenu, #revealTrivia").show().prop('disabled', false);
+  $("#startFinalTimer").prop('disabled', true);
+
+  // Construct countdown timer widget
   $("#finalTimer").knob({
     'min': 0,
     'max': game.time,
@@ -216,22 +224,38 @@ function showFinalTrivia(game){
     'thickness': 0.1
   });
 
-  $("#finalTimer").parent().addClass("finalTimer");
+  $("#finalTimer").parent().addClass("finalTimer").hide();
   $("#finalTimer").val(game.time).trigger('change');
-  $("#finalTimer").on('click', function(e){
-    console.log('clicked')
-  })
 
+  // Create text strings
+  $("#finalTriviaTitle").html('<span>'+game.title+'</span>');
+  $("#finalTriviaQuestion").html('<span>'+game.question+'</span>').hide();
+  sizeStaticElements();
+}
+
+function revealFinalTrivia() {
+  // Update controls
+  $("#revealTrivia").prop("disabled", true);
+  $("#startFinalTimer").prop('disabled', false);
+
+  // Update UI
+  $("#finalTriviaQuestion").fadeIn();
+  sizeStaticElements();
+}
+
+function beginFinalTriviaTimer() {
+  // Update Controls
+  $("#startFinalTimer").prop("disabled", true);
+  $(".finalTimer").fadeIn();
+
+  // Begin countdown
   var countdownInterval = setInterval(function(){
     var newValue = $("#finalTimer").val() - 1;
     if (newValue < 0) clearInterval(countdownInterval);
     else $("#finalTimer").val(newValue).trigger('change');
   }, 1000);
 
-  $("#finalTriviaTitle").html('<span>'+game.title+'</span>');
-  $("#finalTriviaQuestion").html('<span>'+game.question+'</span>');
-
-  sizeStaticElements();
+  // Song playback handled in server.js
 }
 
 
