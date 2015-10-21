@@ -98,15 +98,27 @@ body {
 }
 #controls button {
 	cursor: pointer;
+	padding:8px 10px;
+	font-weight: bold;
+	margin-right: 40px;
+	height:35px;
+	border:none;
+	border-radius:3px;
 }
 #correct {
-	color: #191;
+	color: #FFF;
+	background: #191;
 }
 #incorrect {
-	color: #911;
+	color:#FFF;
+	background: #911;
 }
 #timesup {
 	color: #119;
+}
+#controls button:disabled {
+	color:#CCC;
+	opacity:0.5;
 }
 #questionShell {
 	position:fixed;
@@ -277,15 +289,6 @@ body {
 	bottom: 16px;
 	right: 16px;
 }
-#wager {
-	position: absolute;
-	left: 50%;
-	margin-left: -107px;
-	display: none;
-}
-#wager button {
-	margin-left: 12px;
-}
 #overlay {
 	background:rgba(0,0,0,0.7);
 	position:fixed;
@@ -297,14 +300,12 @@ body {
 	display: none;
 }
 .modal {
-	background:rgba(255, 255, 255, 0.6);
+	background-color:rgba(255, 255, 255, 0.6);
 	color:#000;
 	padding:20px;
-	position: absolute;
-	top:10%;
-	width:80%;
-	top:20%;
-	margin:0 10%;
+	position: relative;
+	width:400px;
+	margin:100px auto;
 	border-radius:10px;
 	min-height: 300px;
 }

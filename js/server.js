@@ -395,6 +395,7 @@ $(function() {
 
     // Rebus Solved
     $("#clearRebus").on("click", function(e){
+      $("#clearRebus").prop("disabled", true);
       var game = GAMES[gameState.getRound()];
       sendCommand('clearRebus');
       updatePoints(gameState.getTeam(), game.boardClearPoints)

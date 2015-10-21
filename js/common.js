@@ -18,12 +18,15 @@ var rescaleTimeout = null;
 function renderQuestion(text) {
   $("#questionShell").show();
   $("#questionDisplay").html("<span>"+text+"</span>").dynasize();
-  $("#questionShell").hide()
-    .fadeIn(CONFIG.transitionDuration);
+  $("#questionShell").hide().fadeIn(CONFIG.transitionDuration);
+  $("#timesup, #clearQuestion, #correct, #incorrect").show();
+  $("#clearRebus").prop("disabled", true);
 }
 
 function hideQuestion() {
   $("#questionShell").fadeOut(CONFIG.transitionDuration);
+  $("#timesup, #clearQuestion, #correct, #incorrect").hide();
+  $("#clearRebus").prop("disabled", false);
 }
 
 function highlightTeam(teamNumber) {
@@ -57,7 +60,11 @@ function showAudience(visible) {
 function buildRebus(game){
   $("#rebus").empty();
   $("section").fadeOut(CONFIG.transitionDuration);
-  $('#clearQuestion, #timesup').hide();
+
+  // Update controls
+  $("#controls button").not("#openMenu").hide();
+  $("#clearRebus, #solution").show();
+  $("#clearRebus").prop("disabled", false);
   showAudience(false);
 
   for (var i = 0; i < CONFIG.rebusRow * CONFIG.rebusColumn; i++) {
@@ -84,7 +91,6 @@ function buildRebus(game){
   $("#rebus").css('background-image', "url('"+game.image+"')");
   $("#rebus").fadeIn(1500);
   $("#solution").html(game.solution);
-  $("#correct, #incorrect, #solution, #clearRebus").show();
 
   if(game.active_question !== undefined) {
     renderQuestion(game.active_question.question);
@@ -104,7 +110,9 @@ function buildCategories(game){
   $("section").fadeOut(CONFIG.transitionDuration);
   $("#categories").empty();
   showAudience(false);
-  $('#clearRebus, #solution').hide();
+
+  // Update controls
+  $("#controls button").not("#openMenu").hide();
 
   $.each(game.board, function(i,v){
     // Create the container for the category
@@ -146,7 +154,6 @@ function buildCategories(game){
     }
   });
 
-  $("#correct, #incorrect, #clearQuestion, #timesup").show();
   $('#categories').fadeIn(CONFIG.transitionDuration);
 
   if(game.active_question !== undefined) {
@@ -162,6 +169,9 @@ function clearCategoriesBlock(arr) {
 function showClosing() {
   $("section").fadeOut(CONFIG.transitionDuration);
   $("#final").fadeIn(CONFIG.transitionDuration);
+
+  // Update controls
+  $("#controls button").not("#openMenu").hide();
 }
 
 function doublePoints(show) {
@@ -177,9 +187,14 @@ function sizeStaticElements(){
 }
 
 function showIntermission(game) {
+
+  // Update section display
   $("section").fadeOut(CONFIG.transitionDuration);
   $("#solution").hide();
   $('#intermission').empty().css('background-image', '');
+
+  // Update controls
+  $("#controls button").not("#openMenu").hide();
 
   if (/\.((png)|(jpg)|(jpeg)|(gif)|(svg))$/i.test(game.source)) {
     $('#intermission').css('background-image', 'url('+game.source+')');
@@ -207,8 +222,8 @@ function buildFinalTrivia(game){
   $("#finalTrivia").fadeIn(CONFIG.transitionDuration);
 
   // Update controls
-  $("#controls button").hide();
-  $("#startFinalTimer, #openMenu, #revealTrivia").show().prop('disabled', false);
+  $("#controls button").not("#openMenu").hide();
+  $("#startFinalTimer, #revealTrivia").show().prop('disabled', false);
   $("#startFinalTimer").prop('disabled', true);
 
   // Construct countdown timer widget
@@ -250,7 +265,10 @@ function beginFinalTriviaTimer() {
   // Begin countdown
   var countdownInterval = setInterval(function(){
     var newValue = $("#finalTimer").val() - 1;
-    if (newValue < 0) clearInterval(countdownInterval);
+    if (newValue < 0) {
+      clearInterval(countdownInterval);
+      $(".finalTimer").fadeOut();
+    }
     else $("#finalTimer").val(newValue).trigger('change');
   }, 1000);
 
