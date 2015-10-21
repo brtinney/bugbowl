@@ -384,6 +384,13 @@ function closeModal() {
 }
 
 
+function getWager(){
+  while(true) {
+    var wager = prompt("Enter team wager:", "");
+    if (wager != null && parseInt(wager, 10) > 0) return parseInt(wager, 10);
+  }
+}
+
 $(function() {
 
     // Rebus Solved
@@ -404,17 +411,6 @@ $(function() {
 
     $('#timesup').on('click', function() {
       timesupSound.play();
-    });
-
-    $('#wager button').on('click', function(e) {
-      var bid = parseInt($('#wager input').val());
-      if(bid > 0) {
-        gameState.setDoublePointsBid(bid);
-        $('#wager').hide();
-      }
-      else {
-        alert('Invalid wager');
-      }
     });
 
     $(window).keydown(function(e) {
@@ -492,10 +488,7 @@ $(function() {
       if (gameState.doublePoints()) {
         sendCommand('doublePoints', true);
         doublePointsSound.play();
-        $('#wager').show();
-      }
-      else {
-        $('#wager').hide();
+        gameState.setDoublePointsBid(getWager());
       }
 
       sendCommand('renderQuestion', question.question);
@@ -503,7 +496,6 @@ $(function() {
     });
 
     $('#doublePoints').on('click', function(e) {
-      if($('#wager').css('display') == 'block') { return; } // Short circuit accidental click
       sendCommand('doublePoints', false);
     });
 
@@ -547,7 +539,7 @@ $(function() {
       var finalSong = new Audio("assets/FinalCowbell.mp3");
       finalSong.play();
     });
-    
+
 
     $('#timeout').on('click', function() {
       clearTimeout(timer);
