@@ -106,14 +106,12 @@ var GameState = (function() {
     var questions;
     var i;
     if (categoryIndex !== undefined) {
-      console.log(_ACTIVE_GAME.board[categoryIndex])
       questions = _ACTIVE_GAME.board[categoryIndex].questions;
-      i = _ACTIVE_GAME.indices[categoryIndex] + 1;
-
+      i = _ACTIVE_GAME.indices[categoryIndex];
     }
     else {
       questions = _ACTIVE_GAME.questions;
-      i = _ACTIVE_GAME.index + 1;
+      i = _ACTIVE_GAME.index;
     }
 
     if(questions[i] === undefined) { alert('Error: Ran out of questions?'); }
