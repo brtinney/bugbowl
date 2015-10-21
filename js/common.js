@@ -57,7 +57,7 @@ function showAudience(visible) {
 function buildRebus(game){
   $("#rebus").empty();
   $("section").fadeOut(CONFIG.transitionDuration);
-  $('clearQuestion').hide();
+  $('#clearQuestion, #timesup').hide();
   showAudience(false);
 
   for (var i = 0; i < CONFIG.rebusRow * CONFIG.rebusColumn; i++) {
@@ -87,7 +87,6 @@ function buildRebus(game){
   $("#correct, #incorrect, #solution, #clearRebus").show();
 
   if(game.active_question !== undefined) {
-    CAN_SCORE = true;
     renderQuestion(game.active_question.question);
     if($('#answerDisplay').length > 0) { renderAnswer(game.active_question.answer); } // Will only work on server
   }
@@ -147,7 +146,7 @@ function buildCategories(game){
     }
   });
 
-  $("#correct, #incorrect, #clearQuestion").show();
+  $("#correct, #incorrect, #clearQuestion, #timesup").show();
   $('#categories').fadeIn(CONFIG.transitionDuration);
 
   if(game.active_question !== undefined) {

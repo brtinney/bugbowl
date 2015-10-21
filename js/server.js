@@ -10,9 +10,6 @@ var GameState = (function() {
   var _TEAM;
   var _POINTS;
   var _GAMES;
-  var _QUESTIONS;
-  var _INDEX;
-  var _DOUBLE;
   var _BID; // Double Points
   var _WAGERS; // Final Trivia
 
@@ -26,9 +23,6 @@ var GameState = (function() {
       _TEAM = JSON.parse(localStorage.team);
       _ROUND = JSON.parse(localStorage.round);
       _GAMES = JSON.parse(localStorage.games);
-      _QUESTIONS = JSON.parse(localStorage.questions);
-      _INDEX = JSON.parse(localStorage.index);
-      _DOUBLE = JSON.parse(localStorage.double);
       _BID = JSON.parse(localStorage.bid);
       _WAGERS = JSON.parse(localStorage.wagers);
     // Make a fresh game state
@@ -38,18 +32,12 @@ var GameState = (function() {
       _TEAM = 0;
       _ROUND = 0;
       _GAMES = $.extend(true, {}, games);
-      _QUESTIONS = null;
-      _INDEX = -1;
-      _DOUBLE = -1;
       _BID = 0;
       _WAGERS = Array(CONFIG.teams.length).fill(0);
       localStorage.points = JSON.stringify(_POINTS);
       localStorage.team = JSON.stringify(_TEAM);
       localStorage.round = JSON.stringify(_ROUND);
       localStorage.games = JSON.stringify(_GAMES);
-      localStorage.questions = JSON.stringify(_QUESTIONS);
-      localStorage.index = JSON.stringify(_INDEX);
-      localStorage.double = JSON.stringify(_DOUBLE);
       localStorage.bid = JSON.stringify(_BID);
       localStorage.wagers = JSON.stringify(_WAGERS);
     }
@@ -59,9 +47,6 @@ var GameState = (function() {
   GameState.prototype.getRound = function() { return _ROUND; };
   GameState.prototype.getPoints = function() { return _POINTS; };
   GameState.prototype.getGames = function() { return _GAMES; };
-  GameState.prototype.getQuestions = function() { return _QUESTIONS; };
-  GameState.prototype.getQuestionIndex = function() { return _INDEX; };
-  GameState.prototype.getDoublePointsIndex = function() { return _DOUBLE; };
   GameState.prototype.getDoublePointsBid = function() { return _BID; };
   GameState.prototype.getWagers = function() { return _WAGERS; };
 
@@ -69,21 +54,26 @@ var GameState = (function() {
   GameState.prototype.setRound = function(round) { _ROUND = round; localStorage.round = JSON.stringify(_ROUND); };
   GameState.prototype.setPoints = function(points) { _POINTS = points; localStorage.points = JSON.stringify(_POINTS); };
   GameState.prototype.setGames = function(games) { _GAMES = games; localStorage.games = JSON.stringify(_GAMES); };
-  GameState.prototype.setQuestions = function(questions) { _QUESTIONS = questions; localStorage.questions = JSON.stringify(_QUESTIONS); };
-  GameState.prototype.setQuestionIndex = function(index) { _INDEX = index; localStorage.index = JSON.stringify(_INDEX); };
-  GameState.prototype.setDoublePointsIndex = function(double) { _DOUBLE = double; localStorage.double = JSON.stringify(_DOUBLE); };
   GameState.prototype.setDoublePointsBid = function(bid) { _BID = bid; localStorage.bid = JSON.stringify(_BID); };
   GameState.prototype.setWagers = function(wagers) { _WAGERS = wagers; localStorage.wagers = JSON.stringify(_WAGERS); };
 
   GameState.prototype.hideBlock = function() {
     _ACTIVE_GAME.blocks[_ACTIVE_GAME.active_cell.column][_ACTIVE_GAME.active_cell.row].hidden = true;
-    this.hideQuestion();
     this.setGames(_GAMES); // Pass by reference will include changes
   };
 
   GameState.prototype.hideQuestion = function() {
+    if(_ACTIVE_GAME.indices !== undefined)
+    {
+      _ACTIVE_GAME.indices[_ACTIVE_GAME.active_cell.column] += 1;
+    }
+
+    _ACTIVE_GAME.index += 1;
+
     delete _ACTIVE_GAME.active_question;
     delete _ACTIVE_GAME.active_cell;
+
+    this.setGames(_GAMES); // Pass by reference will include changes
   }
 
   GameState.prototype.getGame = function(index) {
@@ -99,36 +89,46 @@ var GameState = (function() {
 
     if(_ACTIVE_GAME.type == "rebus")
     {
-      this.setQuestions(_ACTIVE_GAME.questions);
-      this.setTeam(losingTeam());
+      this.setTeam(losingTeam()); // This could cause a change in the team on reload
+      if(_ACTIVE_GAME.active_cell !== undefined) {
+        CAN_SCORE = true;
+      }
     }
     else if(_ACTIVE_GAME.type == "categories")
     {
-      this.setQuestions(_ACTIVE_GAME.board);
-      this.setQuestionIndex(-1);
-      this.setTeam(-1);
-      this.setDoublePointsIndex(Math.floor(Math.random() * (_ACTIVE_GAME.board.length * _ACTIVE_GAME.pointValues.length)));
+      this.setTeam(-1); // This could cause a change in team buzzed in on reload
     }
 
     return _ACTIVE_GAME;
   }
 
   GameState.prototype.getNewQuestion = function(block, categoryIndex) {
-    var questions = this.getQuestions();
+    var questions;
+    var i;
     if (categoryIndex !== undefined) {
-      questions = questions[categoryIndex].questions;
-      gameState.setQuestionIndex(gameState.getQuestionIndex()+1);
+      console.log(_ACTIVE_GAME.board[categoryIndex])
+      questions = _ACTIVE_GAME.board[categoryIndex].questions;
+      i = _ACTIVE_GAME.indices[categoryIndex] + 1;
+
     }
-    var i = Math.floor(Math.random() * questions.length);
+    else {
+      questions = _ACTIVE_GAME.questions;
+      i = _ACTIVE_GAME.index + 1;
+    }
+
+    if(questions[i] === undefined) { alert('Error: Ran out of questions?'); }
+
     _ACTIVE_GAME.active_question = $.extend(true, {}, questions[i]);
-    questions.splice(i,1);
-    this.setQuestions(_QUESTIONS);
     _ACTIVE_GAME.active_cell = {'column': block.data('column'), 'row': block.data('row'), 'points': block.data('points'), 'block': block.data('block')};
 
     this.setGames(_GAMES); // Pass by reference will include changes
 
     return _ACTIVE_GAME.active_question;
   };
+
+  GameState.prototype.doublePoints = function() {
+    return _ACTIVE_GAME.index == _ACTIVE_GAME.double_points;
+  }
 
   GameState.prototype.updatePoints = function(team, delta) {
     _POINTS[team] += delta;
@@ -170,6 +170,7 @@ function runGame(index) {
       sendCommand('showScores', false);
     }
     sendCommand('sizeStaticElements');
+    $('#timeout').hide();
   }
 
   else if (game.type == 'categories') {
@@ -177,18 +178,22 @@ function runGame(index) {
     sendCommand('buildCategories', game);
     sendCommand('showScores', true);
     sendCommand('sizeStaticElements');
+    $('#timeout').show();
   }
 
   else if (game.type == 'intermission') {
     sendCommand('showIntermission', game);
+    $('#timeout').hide();
   }
 
   else if (game.type == 'final_trivia') {
     sendCommand('buildFinalTrivia', game)
+    $('#timeout').hide();
   }
 
   else if (game.type == 'closing') {
-    sendCommand('showClosing')
+    sendCommand('showClosing');
+    $('#timeout').hide();
   }
 
   else {
@@ -205,6 +210,8 @@ if (!clientScreen) alert("ERROR: Pop-up blocker seems to be enabled. Please allo
 var gameState;
 var CAN_SCORE = false;
 var doublePointsSound = new Audio('assets/DoublePoints.m4a');
+var timesupSound = new Audio('assets/timefast.mp3');
+var timer;
 
 function initialize() {
   gameState = new GameState(GAMES, true);
@@ -219,7 +226,46 @@ function initialize() {
   $.each(CONFIG.teams, function(i,v){
     $("#scores_names").append('<td width="'+(100/CONFIG.teams.length)+'%">'+v+'</td>');
     $("#scores_values").append('<td><input type="number" id="overridePoints-'+i+'" data-team="'+i+'" class="overridePoints" /></td>')
-  })
+  });
+
+  $('#timeout-input').knob({
+    'max': 10,
+    'readOnly': true,
+    'width': 40,
+    'height': 40,
+    'fgColor': '#F4D28A',
+    'thickness': 0.2,
+    draw : function() {
+      this.cursorExt = 0.3;
+
+      var a = this.arc(this.cv)  // Arc
+          , pa                   // Previous arc
+          , r = 1;
+
+      this.g.lineWidth = this.lineWidth;
+
+      if (this.o.displayPrevious) {
+          pa = this.arc(this.v);
+          this.g.beginPath();
+          this.g.strokeStyle = this.pColor;
+          this.g.arc(this.xy, this.xy, this.radius - this.lineWidth, pa.s, pa.e, pa.d);
+          this.g.stroke();
+      }
+
+      this.g.beginPath();
+      this.g.strokeStyle = r ? this.o.fgColor : this.fgColor ;
+      this.g.arc(this.xy, this.xy, this.radius - this.lineWidth, a.s, a.e, a.d);
+      this.g.stroke();
+
+      this.g.lineWidth = 2;
+      this.g.beginPath();
+      this.g.strokeStyle = this.o.fgColor;
+      this.g.arc( this.xy, this.xy, this.radius - this.lineWidth + 1 + this.lineWidth * 2 / 3, 0, 2 * Math.PI, false);
+      this.g.stroke();
+
+      return false;
+    }
+  });
 
   sendCommand('highlightTeam', gameState.getTeam());
   sendCommand('updateScores', gameState.getPoints());
@@ -243,7 +289,7 @@ function correct() {
   if (!CAN_SCORE) return;
   var game = GAMES[gameState.getRound()];
   sendCommand('hideQuestion');
-
+  clearTimeout(timer);
 
   if (game.type == "rebus") {
     var cell = gameState.getActiveCell();
@@ -255,7 +301,7 @@ function correct() {
   else if (game.type == "categories") {
     var cell = gameState.getActiveCell();
     var pts = gameState.getActiveCell().points;
-    if (gameState.getQuestionIndex() == gameState.getDoublePointsIndex()) {
+    if (gameState.doublePoints()) {
       pts = gameState.getDoublePointsBid();
     }
     gameState.hideBlock();
@@ -280,7 +326,7 @@ function incorrect() {
   }
   else if (game.type == "categories") {
     var pts = gameState.getActiveCell().points;
-    if (gameState.getQuestionIndex() == gameState.getDoublePointsIndex()) {
+    if (gameState.doublePoints()) {
       pts = gameState.getDoublePointsBid();
     }
     sendCommand('categoriesIncorrect');
@@ -321,6 +367,11 @@ function nextTeam() {
 
 function renderAnswer(answer) {
   $("#answerDisplay").html("<span>"+answer+"</span>").dynasize();
+  $('#timeout-input').val(10).trigger('change');
+  timer = setInterval(function() {
+    if($('#timeout-input').val() <= 0) { clearTimeout(timer); return; }
+    $('#timeout-input').val($('#timeout-input').val()-1).trigger('change');
+  }, 1000);
 }
 
 function showModal() {
@@ -345,9 +396,14 @@ $(function() {
     $('#clearQuestion').on('click', function(e) {
       var cell = gameState.getActiveCell();
       sendCommand('hideQuestion');
+      clearTimeout(timer);
       gameState.hideBlock();
       sendCommand('clearCategoriesBlock', [cell.column, cell.row]);
       gameState.hideQuestion();
+    });
+
+    $('#timesup').on('click', function() {
+      timesupSound.play();
     });
 
     $('#wager button').on('click', function(e) {
@@ -433,7 +489,7 @@ $(function() {
       if(gameState.getTeam() >= 0) { CAN_SCORE = true; }
       var game = GAMES[gameState.getRound()];
       var question = gameState.getNewQuestion($(this), $(this).data('column'));
-      if (gameState.getQuestionIndex() == gameState.getDoublePointsIndex()) {
+      if (gameState.doublePoints()) {
         sendCommand('doublePoints', true);
         doublePointsSound.play();
         $('#wager').show();
@@ -490,5 +546,10 @@ $(function() {
       sendCommand('beginFinalTriviaTimer');
       var finalSong = new Audio("assets/FinalCowbell.mp3");
       finalSong.play();
+    });
+    
+
+    $('#timeout').on('click', function() {
+      clearTimeout(timer);
     });
 });
