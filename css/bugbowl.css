@@ -376,9 +376,9 @@ body {
 
 section#finalTrivia {
 	width:100%;
-	height:100%;
+	height:80%;
 	position:fixed;
-	top:0;
+	top:12%;
 	left:0;
 	background:darkblue;
 	box-shadow: inset 0 0 100px rgba(0,0,0,0.8);
@@ -388,7 +388,7 @@ section#finalTrivia {
 section#finalTrivia #finalTriviaTitle {
 	display:table;
 	text-align: center;
-	height:10%;
+	height:15%;
 	width:100%;
 	color:gold;
 }

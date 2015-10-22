@@ -209,6 +209,7 @@ var gameState;
 var CAN_SCORE = false;
 var doublePointsSound = new Audio('assets/DoublePoints.m4a');
 var timesupSound = new Audio('assets/timefast.mp3');
+var finalSong = new Audio("assets/FinalCowbell.mp3");
 var timer;
 
 function initialize() {
@@ -374,10 +375,12 @@ function renderAnswer(answer) {
 
 function showModal() {
   $('.blurrable').addClass('blurred');
-  $("#overlay").fadeIn();
+  $("#overlay").velocity('fadeIn', 250);
+  $("#scoreModal").velocity("transition.slideUpIn", 250);;
 }
 function closeModal() {
-  $("#overlay").fadeOut();
+  $("#scoreModal").velocity("transition.slideDownOut", 250);;
+  $("#overlay").velocity('fadeOut', 250);
   $(".blurrable").removeClass('blurred');
 }
 
@@ -535,7 +538,6 @@ $(function() {
 
     $("#startFinalTimer").on("click", function(e){
       sendCommand('beginFinalTriviaTimer');
-      var finalSong = new Audio("assets/FinalCowbell.mp3");
       finalSong.play();
     });
 

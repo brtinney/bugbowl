@@ -18,13 +18,13 @@ var rescaleTimeout = null;
 function renderQuestion(text) {
   $("#questionShell").show();
   $("#questionDisplay").html("<span>"+text+"</span>").dynasize();
-  $("#questionShell").hide().fadeIn(CONFIG.transitionDuration);
+  $("#questionShell").velocity("transition.expandIn", CONFIG.transitionDuration);
   $("#timesup, #clearQuestion, #correct, #incorrect").show();
   $("#clearRebus").prop("disabled", true);
 }
 
 function hideQuestion() {
-  $("#questionShell").fadeOut(CONFIG.transitionDuration);
+  $("#questionShell").velocity("transition.expandOut", CONFIG.transitionDuration);
   $("#timesup, #clearQuestion, #correct, #incorrect").hide();
   $("#clearRebus").prop("disabled", false);
 }
@@ -36,13 +36,17 @@ function highlightTeam(teamNumber) {
   }
 }
 
-function updateBoard(){
-
-}
 
 function updateScores(scores){
   $.each(CONFIG.teams, function(i,v){
-    $('#score-'+i+' span.value').text(scores[i]);
+    var existingValue = parseInt($('#score-'+i+' span.value').text(), 10);
+    if (existingValue !== scores[i]) {
+      $('#score-'+i+' span.value')
+        .velocity('transition.expandOut', {
+          duration: 150,
+          complete: function(){$(this).text(scores[i])}})
+        .velocity('transition.expandIn', 150)
+    }
     $('#overridePoints-'+i).val(scores[i]);
   })
 }
@@ -96,6 +100,9 @@ function buildRebus(game){
     renderQuestion(game.active_question.question);
     if($('#answerDisplay').length > 0) { renderAnswer(game.active_question.answer); } // Will only work on server
   }
+
+  $("#rebusBlock").velocity("transition.slideUpIn", 250);;
+
 }
 
 function clearRebus(){
@@ -211,7 +218,7 @@ function showIntermission(game) {
     $('#intermission').html('<span>'+game.text+'</span>').dynasize();
   }
 
-  $('#intermission').fadeIn(CONFIG.transitionDuration);
+  $('#intermission').velocity('transition.slideRightIn', 500);
 }
 
 
@@ -219,7 +226,7 @@ function buildFinalTrivia(game){
 
   // Update section display
   $("section").fadeOut(CONFIG.transitionDuration);
-  $("#finalTrivia").fadeIn(CONFIG.transitionDuration);
+  $("#finalTrivia, #scores").fadeIn(CONFIG.transitionDuration);
 
   // Update controls
   $("#controls button").not("#openMenu").hide();
@@ -235,7 +242,37 @@ function buildFinalTrivia(game){
     'height': ~~(window.innerWidth * 0.20),
     'fgColor': '#FFD700',
     'bgColor': "rgba(0,0,0,0)",
-    'thickness': 0.1
+    'thickness': 0.1,
+    draw : function() {
+      this.cursorExt = 0.3;
+
+      var a = this.arc(this.cv)  // Arc
+          , pa                   // Previous arc
+          , r = 1;
+
+      this.g.lineWidth = this.lineWidth;
+
+      if (this.o.displayPrevious) {
+          pa = this.arc(this.v);
+          this.g.beginPath();
+          this.g.strokeStyle = this.pColor;
+          this.g.arc(this.xy, this.xy, this.radius - this.lineWidth, pa.s, pa.e, pa.d);
+          this.g.stroke();
+      }
+
+      this.g.beginPath();
+      this.g.strokeStyle = r ? this.o.fgColor : this.fgColor ;
+      this.g.arc(this.xy, this.xy, this.radius - this.lineWidth, a.s, a.e, a.d);
+      this.g.stroke();
+
+      this.g.lineWidth = 2;
+      this.g.beginPath();
+      this.g.strokeStyle = this.o.fgColor;
+      this.g.arc( this.xy, this.xy, this.radius - this.lineWidth + 1 + this.lineWidth * 2 / 3, 0, 2 * Math.PI, false);
+      this.g.stroke();
+
+      return false;
+    }
   });
 
   $("#finalTimer").parent().addClass("finalTimer").hide();
@@ -244,6 +281,8 @@ function buildFinalTrivia(game){
   // Create text strings
   $("#finalTriviaTitle").html('<span>'+game.title+'</span>');
   $("#finalTriviaQuestion").html('<span>'+game.question+'</span>').hide();
+  $("#solution").html("<span>"+game.answer+"</span>").hide();
+
   sizeStaticElements();
 }
 
@@ -251,23 +290,26 @@ function revealFinalTrivia() {
   // Update controls
   $("#revealTrivia").prop("disabled", true);
   $("#startFinalTimer").prop('disabled', false);
+  $("#scores").velocity("transition.slideUpOut", 250);;
 
   // Update UI
-  $("#finalTriviaQuestion").fadeIn();
+  $('#finalTriviaQuestion').show().velocity('transition.slideUpIn', { display: 'table' });
+  $("#solution").show();
+
   sizeStaticElements();
 }
 
 function beginFinalTriviaTimer() {
   // Update Controls
   $("#startFinalTimer").prop("disabled", true);
-  $(".finalTimer").fadeIn();
+  $(".finalTimer").velocity('transition.expandIn');
 
   // Begin countdown
   var countdownInterval = setInterval(function(){
     var newValue = $("#finalTimer").val() - 1;
     if (newValue < 0) {
       clearInterval(countdownInterval);
-      $(".finalTimer").fadeOut();
+      $(".finalTimer").velocity('transition.expandOut');
     }
     else $("#finalTimer").val(newValue).trigger('change');
   }, 1000);
