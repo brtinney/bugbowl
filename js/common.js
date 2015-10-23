@@ -240,9 +240,9 @@ function buildFinalTrivia(game){
     'readOnly': true,
     'width': ~~(window.innerWidth  * 0.20),
     'height': ~~(window.innerWidth * 0.20),
-    'fgColor': '#FFD700',
+    'fgColor': '#F4D28A',
     'bgColor': "rgba(0,0,0,0)",
-    'thickness': 0.1,
+    'thickness': 0.2,
     draw : function() {
       this.cursorExt = 0.3;
 

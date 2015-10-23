@@ -10,6 +10,8 @@ var GameState = (function() {
   var _TEAM;
   var _POINTS;
   var _GAMES;
+  var _REBUS_QUESTIONS;
+  var _REBUS_INDEX;
   var _BID; // Double Points
   var _WAGERS; // Final Trivia
 
@@ -23,6 +25,8 @@ var GameState = (function() {
       _TEAM = JSON.parse(localStorage.team);
       _ROUND = JSON.parse(localStorage.round);
       _GAMES = JSON.parse(localStorage.games);
+      _REBUS_QUESTIONS = JSON.parse(localStorage.rebusQuestions);
+      _REBUS_INDEX = JSON.parse(localStorage.rebusIndex);
       _BID = JSON.parse(localStorage.bid);
       _WAGERS = JSON.parse(localStorage.wagers);
     // Make a fresh game state
@@ -32,12 +36,16 @@ var GameState = (function() {
       _TEAM = 0;
       _ROUND = 0;
       _GAMES = $.extend(true, {}, games);
+      _REBUS_QUESTIONS = null;
+      _REBUS_INDEX = 0;
       _BID = 0;
       _WAGERS = Array(CONFIG.teams.length).fill(0);
       localStorage.points = JSON.stringify(_POINTS);
       localStorage.team = JSON.stringify(_TEAM);
       localStorage.round = JSON.stringify(_ROUND);
       localStorage.games = JSON.stringify(_GAMES);
+      localStorage.rebusQuestions = JSON.stringify(_REBUS_QUESTIONS);
+      localStorage.rebusIndex = JSON.stringify(_REBUS_INDEX);
       localStorage.bid = JSON.stringify(_BID);
       localStorage.wagers = JSON.stringify(_WAGERS);
     }
@@ -47,6 +55,8 @@ var GameState = (function() {
   GameState.prototype.getRound = function() { return _ROUND; };
   GameState.prototype.getPoints = function() { return _POINTS; };
   GameState.prototype.getGames = function() { return _GAMES; };
+  GameState.prototype.getRebusQuestions = function() { return _REBUS_QUESTIONS; };
+  GameState.prototype.getRebusIndex = function() { return _REBUS_INDEX; };
   GameState.prototype.getDoublePointsBid = function() { return _BID; };
   GameState.prototype.getWagers = function() { return _WAGERS; };
 
@@ -54,6 +64,8 @@ var GameState = (function() {
   GameState.prototype.setRound = function(round) { _ROUND = round; localStorage.round = JSON.stringify(_ROUND); };
   GameState.prototype.setPoints = function(points) { _POINTS = points; localStorage.points = JSON.stringify(_POINTS); };
   GameState.prototype.setGames = function(games) { _GAMES = games; localStorage.games = JSON.stringify(_GAMES); };
+  GameState.prototype.setRebusQuestions = function(questions) { _REBUS_QUESTIONS = questions; localStorage.rebusQuestions = JSON.stringify(_REBUS_QUESTIONS); };
+  GameState.prototype.setRebusIndex = function(index) { _REBUS_INDEX = index; localStorage.rebusIndex = JSON.stringify(_REBUS_INDEX); };
   GameState.prototype.setDoublePointsBid = function(bid) { _BID = bid; localStorage.bid = JSON.stringify(_BID); };
   GameState.prototype.setWagers = function(wagers) { _WAGERS = wagers; localStorage.wagers = JSON.stringify(_WAGERS); };
 
@@ -63,11 +75,12 @@ var GameState = (function() {
   };
 
   GameState.prototype.hideQuestion = function() {
-    if(_ACTIVE_GAME.indices !== undefined)
-    {
+    if(_ACTIVE_GAME.indices !== undefined) {
       _ACTIVE_GAME.indices[_ACTIVE_GAME.active_cell.column] += 1;
     }
-
+    else {
+      this.setRebusIndex(_REBUS_INDEX+1);
+    }
     _ACTIVE_GAME.index += 1;
 
     delete _ACTIVE_GAME.active_question;
@@ -84,11 +97,18 @@ var GameState = (function() {
     return _ACTIVE_GAME.active_cell;
   }
 
+  GameState.prototype.getActiveGame = function() {
+    return _ACTIVE_GAME;
+  }
+
   GameState.prototype.prepareGame = function(index) {
     _ACTIVE_GAME = _GAMES[index];
 
     if(_ACTIVE_GAME.type == "rebus")
     {
+      if(_REBUS_QUESTIONS === null) {
+        this.setRebusQuestions($.extend(true, {}, _ACTIVE_GAME.questions));
+      }
       this.setTeam(losingTeam()); // This could cause a change in the team on reload
       if(_ACTIVE_GAME.active_cell !== undefined) {
         CAN_SCORE = true;
@@ -110,8 +130,8 @@ var GameState = (function() {
       i = _ACTIVE_GAME.indices[categoryIndex];
     }
     else {
-      questions = _ACTIVE_GAME.questions;
-      i = _ACTIVE_GAME.index;
+      questions = _REBUS_QUESTIONS;
+      i = _REBUS_INDEX;
     }
 
     if(questions[i] === undefined) { alert('Error: Ran out of questions?'); }
@@ -169,6 +189,7 @@ function runGame(index) {
     }
     sendCommand('sizeStaticElements');
     $('#timeout').hide();
+    $('#doubleCounter').hide();
   }
 
   else if (game.type == 'categories') {
@@ -177,21 +198,25 @@ function runGame(index) {
     sendCommand('showScores', true);
     sendCommand('sizeStaticElements');
     $('#timeout').show();
+    updateDoubleCounter(game);
   }
 
   else if (game.type == 'intermission') {
     sendCommand('showIntermission', game);
     $('#timeout').hide();
+    $('#doubleCounter').hide();
   }
 
   else if (game.type == 'final_trivia') {
     sendCommand('buildFinalTrivia', game)
     $('#timeout').hide();
+    $('#doubleCounter').hide();
   }
 
   else if (game.type == 'closing') {
     sendCommand('showClosing');
     $('#timeout').hide();
+    $('#doubleCounter').hide();
   }
 
   else {
@@ -296,6 +321,7 @@ function correct() {
     sendCommand('clearRebusBlock', cell.block);
     updatePoints(gameState.getTeam(), game.points);
     //nextTeam();
+    gameState.hideQuestion();
   }
   else if (game.type == "categories") {
     var cell = gameState.getActiveCell();
@@ -308,15 +334,19 @@ function correct() {
     updatePoints(gameState.getTeam(), pts);
     gameState.setTeam(-1);
     sendCommand('highlightTeam', -1);
+    gameState.hideQuestion();
+    updateDoubleCounter(gameState.getActiveGame());
   }
 
-  gameState.hideQuestion();
   CAN_SCORE = false;
 }
 
 function incorrect() {
   if (!CAN_SCORE) return;
   var game = GAMES[gameState.getRound()];
+
+  // Audience short-circuit
+  if (game.type == "rebus" && game.points == 0) { return; }
 
   if (game.type == "rebus") {
     sendCommand('hideQuestion');
@@ -384,6 +414,18 @@ function closeModal() {
   $(".blurrable").removeClass('blurred');
 }
 
+function updateDoubleCounter(game) {
+  var d = (parseInt(game.double_points) + 1) - parseInt(game.index);
+  if(d <= 0) {
+    $('#doubleCounter').hide();
+  }
+  else if(d > 1) {
+    $('#doubleCounter').html('Double Points in <strong>'+d+'</strong> questions').show();
+  }
+  else {
+    $('#doubleCounter').html('Double Points <strong>next question</strong>').show();
+  }
+}
 
 function getWager(){
   while(true) {
@@ -409,6 +451,7 @@ $(function() {
       gameState.hideBlock();
       sendCommand('clearCategoriesBlock', [cell.column, cell.row]);
       gameState.hideQuestion();
+      updateDoubleCounter(gameState.getActiveGame());
     });
 
     $('#timesup').on('click', function() {
