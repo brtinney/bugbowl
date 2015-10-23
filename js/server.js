@@ -398,7 +398,7 @@ function renderAnswer(answer) {
   $("#answerDisplay").html("<span>"+answer+"</span>").dynasize();
   $('#timeout-input').val(10).trigger('change');
   timer = setInterval(function() {
-    if($('#timeout-input').val() <= 0) { clearTimeout(timer); return; }
+    if($('#timeout-input').val() <= 0) { clearInterval(timer); return; }
     $('#timeout-input').val($('#timeout-input').val()-1).trigger('change');
   }, 1000);
 }
@@ -533,7 +533,11 @@ $(function() {
       if (gameState.doublePoints()) {
         sendCommand('doublePoints', true);
         doublePointsSound.play();
-        gameState.setDoublePointsBid(getWager());
+
+        // Delay to allow doublePoints to propagate
+        setTimeout(function(){
+          gameState.setDoublePointsBid(getWager());
+        }, 750);
       }
 
       sendCommand('renderQuestion', question.question);
