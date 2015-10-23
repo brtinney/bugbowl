@@ -377,6 +377,7 @@ function beginFinalTriviaTimer() {
     if (newValue < 0) {
       clearInterval(countdownInterval);
       $(".finalTimer").velocity('transition.expandOut');
+      setTimeout(function(){ if (window['showModal']) showModal(); }, 1000);
     }
     else $("#finalTimer").val(newValue).trigger('change');
   }, 1000);

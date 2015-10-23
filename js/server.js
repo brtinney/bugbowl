@@ -508,13 +508,11 @@ $(function() {
 
     $("#openMenu").on("click", showModal);
 
-    /*
-    // TODO: Re-enable context menu bind when we don't need to inspect things
     $(document).bind("contextmenu",function(e){
-      showModal();
+      if (parseInt($(".modal").css('opacity'), 10) == 0) showModal();
+      else closeModal();
       return false;
    });
-   */
 
     $("#correct").on("click", correct);
     $("#incorrect").on("click", incorrect);
