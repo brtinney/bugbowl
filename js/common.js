@@ -173,12 +173,39 @@ function clearCategoriesBlock(arr) {
   $("#categoriesColumn-"+arr[0]+" .categoriesOption").eq(arr[1]).addClass('clear');
 }
 
-function showClosing() {
+function showClosing(scores) {
+
+  // Update Interface
   $("section").fadeOut(CONFIG.transitionDuration);
   $("#final").fadeIn(CONFIG.transitionDuration);
 
   // Update controls
   $("#controls button").not("#openMenu").hide();
+
+  // Rank the teams
+  ranked = [];
+  for (var i in scores) ranked.push({name: CONFIG.teams[i], score: scores[i]});
+  ranked = ranked.sort(function(a,b){ return b.score - a.score; });
+
+  // Add scores to UI
+  $.each(ranked, function(i,v){ $('<div/>', {
+      "data-sizefactor": 0.65,
+      "class": "finalBlock",
+      style: "height:"+(100/CONFIG.teams.length)+"%",
+      html:
+        '<div class="teamName autosize" data-sizegroup="teamName" data-sizefactor="0.9"><span>'
+          +v.name+
+        '</span></div>'+
+        '<div class="finalScore autosize" data-sizegroup="finalScore" data-sizefactor="0.7"><span>'
+          +v.score+
+        '</span><div>'
+    }).appendTo("#finalScores")
+  })
+
+  sizeStaticElements();
+
+  if (typeof FIREWORKS !== 'undefined')
+    FIREWORKS.start();
 }
 
 function doublePoints(show) {

@@ -214,7 +214,7 @@ function runGame(index) {
   }
 
   else if (game.type == 'closing') {
-    sendCommand('showClosing');
+    sendCommand('showClosing', gameState.getPoints());
     $('#timeout').hide();
     $('#doubleCounter').hide();
   }
@@ -378,7 +378,7 @@ function losingTeam() {
     }
   }
 
-  return parseInt(losing);
+  return parseInt(losing, 10);
 }
 
 function nextTeam() {
