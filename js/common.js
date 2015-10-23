@@ -118,7 +118,7 @@ function clearRebusBlock(block) {
 }
 
 function buildCategories(game){
-  $("section").fadeOut(CONFIG.transitionDuration);
+  $("section, #solution").fadeOut(CONFIG.transitionDuration);
   $("#categories").empty();
   showAudience(false);
 
