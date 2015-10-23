@@ -63,6 +63,7 @@ function showAudience(visible) {
 
 function buildRebus(game){
   $("#rebus").empty();
+  $("#rebus").css('background-image', "none");
   $("section").fadeOut(CONFIG.transitionDuration);
 
   // Update controls
@@ -92,7 +93,6 @@ function buildRebus(game){
     a.appendTo("#rebus");
   }
 
-  $("#rebus").css('background-image', "url('"+game.image+"')");
   $("#rebus").fadeIn();
   $("#solution").html(game.solution);
 
@@ -104,7 +104,8 @@ function buildRebus(game){
   $(".rebusBlock").velocity("transition.expandIn", {
     display: 'table',
     stagger: 65,
-    duration: 400
+    duration: 400,
+    complete: function(){ $("#rebus").css('background-image', "url('"+game.image+"')"); }
   });
 }
 
@@ -170,6 +171,21 @@ function buildCategories(game){
     renderQuestion(game.active_question.question);
     if($('#answerDisplay').length > 0) { renderAnswer(game.active_question.answer); } // Will only work on server
   }
+
+  var blockDelay = 50;
+  var questionsPerCategory = game.board[0].questions.length;
+
+  $(".categoriesHeader").velocity("transition.fadeIn", {
+    display: 'table',
+    stagger: blockDelay * questionsPerCategory,
+    duration: 350
+  });
+
+  $(".categoriesOption").velocity("transition.fadeIn", {
+    display: 'table',
+    stagger: blockDelay,
+    duration: 350
+  });
 }
 
 function clearCategoriesBlock(arr) {
