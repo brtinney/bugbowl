@@ -537,6 +537,7 @@ $(function() {
         // Delay to allow doublePoints to propagate
         setTimeout(function(){
           gameState.setDoublePointsBid(getWager());
+          sendCommand('doublePoints', false);
         }, 750);
       }
 
