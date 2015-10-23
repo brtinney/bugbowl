@@ -539,6 +539,7 @@ $(function() {
     // ====================
 
     $("#revealTrivia").on("click", function(e){ sendCommand('revealFinalTrivia'); });
+    $("#revealLightning").on("click", function(e){ sendCommand('revealLightning'); });
 
     $("#startFinalTimer").on("click", function(e){
       sendCommand('beginFinalTriviaTimer');

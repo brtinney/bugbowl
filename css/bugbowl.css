@@ -385,14 +385,14 @@ section#finalTrivia {
 	text-shadow: 2px 4px 3px rgba(0,0,0,0.6);
 	display: none;
 }
-section#finalTrivia #finalTriviaTitle {
+section#finalTrivia #finalTriviaTitle, section#finalTrivia #lightningTitle {
 	display:table;
 	text-align: center;
 	height:15%;
 	width:100%;
 	color:gold;
 }
-#finalTriviaQuestion {
+#finalTriviaQuestion, #lightningQuestion {
 	display:table;
 	position:absolute;
 	right:5%;

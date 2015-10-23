@@ -230,8 +230,8 @@ function buildFinalTrivia(game){
 
   // Update controls
   $("#controls button").not("#openMenu").hide();
-  $("#startFinalTimer, #revealTrivia").show().prop('disabled', false);
-  $("#startFinalTimer").prop('disabled', true);
+  $("#startFinalTimer, #revealTrivia, #revealLightning").show().prop('disabled', false);
+  $("#startFinalTimer, #revealLightning").prop('disabled', true);
 
   // Construct countdown timer widget
   $("#finalTimer").knob({
@@ -283,7 +283,15 @@ function buildFinalTrivia(game){
   $("#finalTriviaQuestion").html('<span>'+game.question+'</span>').hide();
   $("#solution").html("<span>"+game.answer+"</span>").hide();
 
+  $("#lightningTitle").html('<span>'+game.lightingTitle+'</span>').hide();
+  $("#lightningQuestion").html('<span>'+game.lightningQuestion+'</span>').hide();
+
   sizeStaticElements();
+  $("#finalTriviaTitle").velocity('transition.slideUpIn', {
+    display: 'table',
+    duration: CONFIG.transitionDuration
+  });
+
 }
 
 function revealFinalTrivia() {
@@ -299,10 +307,23 @@ function revealFinalTrivia() {
   sizeStaticElements();
 }
 
+function revealLightning() {
+  $("#startFinalTimer, #revealTrivia, #revealLightning").prop('disabled', true);
+  $("#finalTriviaTitle, #finalTriviaQuestion").velocity('transition.slideUpOut', {
+      duration: 250,
+      complete: function(){
+        $("#lightningTitle, #lightningQuestion").show();
+        sizeStaticElements();
+        $("#lightningTitle, #lightningQuestion").velocity('transition.slideUpIn', { display: 'table' });
+      }
+  });
+}
+
 function beginFinalTriviaTimer() {
   // Update Controls
   $("#startFinalTimer").prop("disabled", true);
   $(".finalTimer").velocity('transition.expandIn');
+  $("#revealLightning").prop('disabled', false);
 
   // Begin countdown
   var countdownInterval = setInterval(function(){
