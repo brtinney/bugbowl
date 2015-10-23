@@ -211,6 +211,11 @@ body {
 	bottom: 12px;
 	cursor: pointer;
 }
+#doubleCounter {
+	display: none;
+	position: absolute;
+	right: 140px;
+}
 .clearfix:after {
 	visibility: hidden;
 	display: block;
@@ -237,7 +242,8 @@ body {
 }
 #intermission span {
 	display: block;
-	padding: 20% 5%;
+	padding: 22% 5%;
+	text-shadow: .03em .03em .05em rgba(0,0,0,0.8);
 }
 #categories {
 	display:none;
@@ -380,7 +386,7 @@ section#finalTrivia {
 	position:fixed;
 	top:12%;
 	left:0;
-	background:darkblue;
+	background:#10273E;
 	box-shadow: inset 0 0 100px rgba(0,0,0,0.8);
 	text-shadow: 2px 4px 3px rgba(0,0,0,0.6);
 	display: none;
@@ -390,7 +396,7 @@ section#finalTrivia #finalTriviaTitle, section#finalTrivia #lightningTitle {
 	text-align: center;
 	height:15%;
 	width:100%;
-	color:gold;
+	color:#F4D28A;
 }
 #finalTriviaQuestion, #lightningQuestion {
 	display:table;
