@@ -93,7 +93,7 @@ function buildRebus(game){
   }
 
   $("#rebus").css('background-image', "url('"+game.image+"')");
-  $("#rebus").fadeIn(1500);
+  $("#rebus").fadeIn();
   $("#solution").html(game.solution);
 
   if(game.active_question !== undefined) {
@@ -101,8 +101,11 @@ function buildRebus(game){
     if($('#answerDisplay').length > 0) { renderAnswer(game.active_question.answer); } // Will only work on server
   }
 
-  $("#rebusBlock").velocity("transition.slideUpIn", 250);;
-
+  $(".rebusBlock").velocity("transition.expandIn", {
+    display: 'table',
+    stagger: 65,
+    duration: 400
+  });
 }
 
 function clearRebus(){
