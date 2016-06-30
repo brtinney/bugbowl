@@ -87,6 +87,7 @@ var GameState = (function() {
     delete _ACTIVE_GAME.active_cell;
 
     this.setGames(_GAMES); // Pass by reference will include changes
+    $("#next-round").show();
   }
 
   GameState.prototype.getGame = function(index) {
@@ -395,8 +396,10 @@ function nextTeam() {
 }
 
 function renderAnswer(answer) {
+  $("#next-round").hide();
   $("#answerDisplay").html("<span>"+answer+"</span>").dynasize();
   $('#timeout-input').val(10).trigger('change');
+  clearInterval(timer);
   timer = setInterval(function() {
     if($('#timeout-input').val() <= 0) { clearInterval(timer); return; }
     $('#timeout-input').val($('#timeout-input').val()-1).trigger('change');
