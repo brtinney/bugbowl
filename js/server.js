@@ -589,6 +589,8 @@ $(function() {
     $("#startFinalTimer").on("click", function(e){
       sendCommand('beginFinalTriviaTimer');
       finalSong.play();
+      $("#scoresAlert").show();
+      showModal();
     });
 
 

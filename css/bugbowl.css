@@ -432,3 +432,10 @@ section#finalTrivia #finalTriviaTitle, section#finalTrivia #lightningTitle {
 	color:#999;
 	height:30%;
 }
+#scoresAlert {
+	background:yellow;
+	padding:10px;
+	display:none;
+	text-align:center;
+	font-size:2em;
+}
