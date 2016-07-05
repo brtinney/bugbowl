@@ -269,6 +269,8 @@ function showIntermission(game) {
 
 
 function buildFinalTrivia(game){
+    // Pause any skipped intermissions
+    $("video").each(function(){ $(this).get(0).pause(); });
 
   // Update section display
   $("section").fadeOut(CONFIG.transitionDuration);
