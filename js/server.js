@@ -412,9 +412,11 @@ function showModal() {
   $("#scoreModal").velocity("transition.slideUpIn", 250);;
 }
 function closeModal() {
-  $("#scoreModal").velocity("transition.slideDownOut", 250);;
-  $("#overlay").velocity('fadeOut', 250);
-  $(".blurrable").removeClass('blurred');
+  if($("#scoreModal").is(':visible')) {
+    $("#scoreModal").velocity("transition.slideDownOut", 250);;
+    $("#overlay").velocity('fadeOut', 250);
+    $(".blurrable").removeClass('blurred');
+  }
 }
 
 function updateDoubleCounter(game) {
@@ -531,7 +533,7 @@ $(function() {
       if(gameState.getTeam() >= 0) { CAN_SCORE = true; }
       var game = GAMES[gameState.getRound()];
       var question = gameState.getNewQuestion($(this), $(this).data('column'));
-      if (gameState.doublePoints()) {
+      if (gameState.doublePoints() && typeof gameState.getActiveCell().points == 'number') {
         sendCommand('doublePoints', true);
         doublePointsSound.play();
 
@@ -539,7 +541,7 @@ $(function() {
         setTimeout(function(){
           gameState.setDoublePointsBid(getWager());
           sendCommand('doublePoints', false);
-        }, 750);
+        }, 1500);
       }
 
       sendCommand('renderQuestion', question.question);

@@ -3,11 +3,11 @@
     <head>
         <meta charset="utf-8">
         <meta http-equiv="x-ua-compatible" content="ie=edge">
-        <title>BugBowl 2015 Cheatsheet</title>
+        <title>BugBowl 2016 Cheatsheet</title>
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <style>
-          body { font-family: "Century Gothic", Helvetica, Arial, sans-serif; font-size: 13.6px; }
+          body { font-family: "Century Gothic", Helvetica, Arial, sans-serif; font-size: 18px; }
           table { border-collapse: collapse; padding: 0; margin: 0; border-spacing: 0; width: 100%; }
           td { border: 1px solid #000; }
           td, th { padding: 4px 8px; }
@@ -63,20 +63,42 @@
           ';
 
           // Audience Rounds
-          out += '\
-          <div class="page">\
-            <h3>BugBowl Audience Round</h3>\
-            <table>\
-              <thead>\
-                <tr>\
-                  <th class="num">No.</th>\
-                  <th class="question">Question</th>\
-                  <th class="answer">Answer</th>\
-                </tr>\
-              </thead>\
-              <tbody>\
-          ';
-          $.each(audience_questions, function(i, v) {
+
+          var round = 0;
+          $.each(GAMES, function(i, v) {
+            if(v.type == "categories" && round < 1) {
+              round++;
+              out += '\
+              <div class="page">\
+                <h3>BugBowl Audience Round</h3>\
+                <table>\
+                  <thead>\
+                    <tr>\
+                      <th class="num">No.</th>\
+                      <th class="question">Question</th>\
+                      <th class="answer">Answer</th>\
+                    </tr>\
+                  </thead>\
+                  <tbody>\
+              ';
+              $.each(v.board, function(j, w) {
+                $.each(w.questions, function(k, x) {
+                  out += '<tr>';
+                  out += '<td class="points">'+v.pointValues[k]+'</td>';
+                  out += '<td class="category">'+w.category+'</td>';
+                  out += '<td class="c-question">'+x.question+'</td>';
+                  out += '<td class="c-answer">'+x.answer+'</td>';
+                  out += '</tr>';
+                });
+              });
+              out += '\
+                  </tbody>\
+                </table>\
+              </div>\
+              ';
+            }
+          });
+          /*$.each(audience_questions, function(i, v) {
             out += '<tr>';
             out += '<td class="num">'+(i+1)+'</td>';
             out += '<td class="question">'+v.question+'</td>';
@@ -87,13 +109,14 @@
               </tbody>\
             </table>\
           </div>\
-          ';
+          ';*/
 
           // Category Rounds
-          var round = 0;
+          round = -1;
           $.each(GAMES, function(i, v) {
             if(v.type == "categories") {
               round++;
+              if(round == 0) { return; }
               out += '\
               <div class="page">\
                 <h3>BugBowl Category Round '+round+'</h3>\

@@ -9,7 +9,9 @@ $(function(){
       style: "width:"+(100/CONFIG.teams.length)+"%",
       html: '<div class="name">'+v+'</div><span class="value">0</span>'
     }).appendTo("#scores")
-  })
+  });
+
+  $('title').text($('title').text() + ' ' + YEAR);
 
 });
 
@@ -250,13 +252,14 @@ function showIntermission(game) {
   $("#controls button").not("#openMenu").hide();
 
   if (/\.((png)|(jpg)|(jpeg)|(gif)|(svg))$/i.test(game.source)) {
-    $('#intermission').css('background-image', 'url('+game.source+')');
+    $('#intermission').css({'background-image': 'url('+game.source+')',
+                            'display': 'none'});
   }
   else if (/\.((swf)|(flv))$/i.test(game.source)) {
-    $('#intermission').html('<embed src="'+game.source+'">');
+    $('#intermission').css({'display': 'none'}).html('<embed src="'+game.source+'">');
   }
   else if (/\.((mov)|(mp4))$/i.test(game.source)) {
-    $('#intermission').html('<video autoplay src="'+game.source+'">');
+    $('#intermission').css({'display': 'none'}).html('<video autoplay src="'+game.source+'">');
   }
 
   if(game.text) {
