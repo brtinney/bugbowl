@@ -239,6 +239,21 @@ var finalSong = new Audio("assets/FinalCowbell.mp3");
 var timer;
 
 function initialize() {
+
+
+  $.each(GAMES, function(i, v) {
+          if(v.type == 'rebus') {
+                  v.blocks = Array(CONFIG.rebusColumn).fill(Array(CONFIG.rebusRow).fill({}));
+                  v.index = 0;
+          }
+          else if(v.type == 'categories') {
+                  v.blocks = Array(v.board.length).fill(Array(v.pointValues.length).fill({}));
+                  v.indices = Array(v.board.length).fill(0);
+                  v.double_points = -1; //Math.floor(Math.random() * (v.board.length * v.pointValues.length));
+                  v.index = 0;
+          }
+  });
+
   gameState = new GameState(GAMES, true);
 
   $.each(GAMES, function(i,v){ $('<option/>', {
@@ -327,6 +342,10 @@ function correct() {
   else if (game.type == "categories") {
     var cell = gameState.getActiveCell();
     var pts = gameState.getActiveCell().points;
+
+    // Audience round short-circuit
+    if (isNaN(pts)) { console.log('Skipping non-point question'); return; }
+
     if (gameState.doublePoints()) {
       pts = gameState.getDoublePointsBid();
     }
@@ -346,9 +365,6 @@ function incorrect() {
   if (!CAN_SCORE) return;
   var game = GAMES[gameState.getRound()];
 
-  // Audience short-circuit
-  if (game.type == "rebus" && game.points == 0) { return; }
-
   if (game.type == "rebus") {
     sendCommand('hideQuestion');
     gameState.hideQuestion();
@@ -356,6 +372,10 @@ function incorrect() {
   }
   else if (game.type == "categories") {
     var pts = gameState.getActiveCell().points;
+
+    // Audience round short-circuit
+    if (isNaN(pts)) { console.log('Skipping non-point question'); return; }
+
     if (gameState.doublePoints()) {
       pts = gameState.getDoublePointsBid();
     }
