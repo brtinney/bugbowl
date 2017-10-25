@@ -475,3 +475,9 @@ section#finalTrivia #finalTriviaTitle, section#finalTrivia #lightningTitle {
 	text-align:center;
 	font-size:2em;
 }
+.keytag {
+	background:white;
+	border-radius:3px;
+	padding:1px 3px;
+	display: inline-block;
+}
