@@ -5,7 +5,7 @@
         <meta http-equiv="x-ua-compatible" content="ie=edge">
         <title>BugBowl 2016 Cheatsheet</title>
         <meta name="description" content="">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="viewport" content="">
         <style>
           body { font-family: "Century Gothic", Helvetica, Arial, sans-serif; font-size: 18px; }
           table { border-collapse: collapse; padding: 0; margin: 0; border-spacing: 0; width: 100%; }
@@ -15,11 +15,13 @@
           .page { page-break-after: always; }
           h3 { text-align: center; }
           @media print {
+            h1 { font-size:60pt; }
+            body { font-size: 24pt; }
             .page { page-break-after: always; }
             .page:last-child { page-break-after: auto; }
             thead { display: table-header-group; }
             tr { display: flex; page-break-inside: avoid; }
-            td { margin-top: -1px; position: relative; top: 1px; }
+            td { margin-top: -1px; position: relative; top: 1px; overflow: hidden; padding:5px;}
             .num { width: 2%; }
             td.num, td.question, td.points, td.category, td.c-question { border-right: none; }
             .question { width: 73%; }

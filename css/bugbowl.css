@@ -223,7 +223,7 @@ pre {
 	text-align: center;
 	background: linear-gradient(to bottom, #2897B8 0%,#1C6B82 41%,#1C6B82 100%);
 	cursor: pointer;
-	box-sizing: border-box;
+	box-sizing:border-box;
 	border:1px solid #FFF;
 	text-shadow: 2px 2px 3px rgba(0,0,0,0.6);
 	font-weight: bold;
@@ -235,10 +235,13 @@ pre {
 	visibility: hidden;
 }
 #solution {
-	text-align: center;
+	text-align: right;
 	font-size: 150%;
 	color: #F4D28A;
 	display: none;
+	bottom:3px;
+	position: absolute;
+	width:100%;
 }
 #timeout {
 	display: none;
@@ -347,12 +350,12 @@ pre {
 	padding:20px;
 	position: relative;
 	width:400px;
-	margin:100px auto;
+	margin:10px auto;
 	border-radius:10px;
 	min-height: 300px;
 }
 .modal h1 {
-	font-size:28px;
+	font-size:18px;
 	text-align: center;
 	font-weight: bold;
 	padding:10px;
@@ -480,4 +483,20 @@ section#finalTrivia #finalTriviaTitle, section#finalTrivia #lightningTitle {
 	border-radius:3px;
 	padding:1px 3px;
 	display: inline-block;
+}
+.wagerSuccess {
+	background:#DFF0D8;
+	color:#3c763d;
+}
+.wagerFail {
+	background:#F2DEDE;
+	color:#a94442;
+}
+.updateWager {
+	padding:5px;
+	width:40%;
+	border:0;
+	border-radius:4px;
+	cursor:pointer;
+	font-weight:bold;
 }

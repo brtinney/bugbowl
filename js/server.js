@@ -150,6 +150,11 @@ var GameState = (function() {
   }
 
   GameState.prototype.updatePoints = function(team, delta) {
+    var delta = parseInt(delta, 10);
+    if (isNaN(delta)){
+        console.log('Rejecting NaN delta point update for team ' + team);
+        return _POINTS;
+    }
     _POINTS[team] += delta;
     this.setPoints(_POINTS);
     return _POINTS;
@@ -196,7 +201,10 @@ function runGame(index) {
   else if (game.type == 'categories') {
     game = gameState.prepareGame(index);
     sendCommand('buildCategories', game);
-    sendCommand('showScores', true);
+    if ('scoring' in game)
+      sendCommand('showScores', game.scoring);
+    else
+      sendCommand('showScores', true);
     sendCommand('sizeStaticElements');
     $('#timeout').show();
     updateDoubleCounter(game);
@@ -212,6 +220,7 @@ function runGame(index) {
     sendCommand('buildFinalTrivia', game)
     $('#timeout').hide();
     $('#doubleCounter').hide();
+    $("#next-round").hide(); // Want to use the Reveal/Start/Lightning controls instead
   }
 
   else if (game.type == 'closing') {
@@ -266,6 +275,11 @@ function initialize() {
   $.each(CONFIG.teams, function(i,v){
     $("#scores_names").append('<td width="'+(100/CONFIG.teams.length)+'%">'+v+'</td>');
     $("#scores_values").append('<td><input type="number" id="overridePoints-'+i+'" data-team="'+i+'" class="overridePoints" /></td>')
+    $("#scores_wagers").append('<td><input type="number" id="wagerPoints-'+i+'" data-team="'+i+'" class="wagerPoints" placeholder="wager" /></td>')
+    $("#scores_actions").append('<td> \
+        <button data-team="'+i+'" data-award="true" class="updateWager wagerSuccess">&#x2714;</button> \
+        <button data-team="'+i+'" data-award="false" class="updateWager wagerFail">&#x2716;</button> \
+    </td>')
   });
 
   $('#timeout-input').knob({
@@ -601,6 +615,25 @@ $(function() {
       closeModal();
     });
 
+    // Handler to enable/disable the wager controls (to prevent state corruption)
+    $("#scoreModal").on("change", "wagerPoints", function(e){});
+
+    // Handler to apply wager to a team's score
+    $("#scoreModal").on("click", '.updateWager', function(e){
+        var succeeded = $(this).data('award');
+        var team = $(this).data('team');
+        var points = parseInt($("#wagerPoints-"+team).val(), 10);
+        if (!succeeded) {
+            points *= -1;
+            $("#overridePoints-"+team).addClass('wagerFail').removeClass('wagerSuccess');
+        }
+        else {
+            $("#overridePoints-"+team).addClass('wagerSuccess').removeClass('wagerFail');
+        }
+        gameState.updatePoints(team, points);
+        sendCommand('updateScores', gameState.getPoints());
+    });
+
     // ====================
     // FINAL TRIVIA
     // ====================
@@ -613,6 +646,7 @@ $(function() {
       finalSong.play();
       $("#scoresAlert").show();
       showModal();
+      $("#next-round").show();
     });
 
 
