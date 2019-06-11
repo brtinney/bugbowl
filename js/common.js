@@ -16,6 +16,14 @@ $(function(){
 });
 
 var rescaleTimeout = null;
+var animTimer = 0;
+var zoomLevel = 1;
+
+function run() {
+  $("#next-round").show();
+  $('#timeout').hide();
+  $('#doubleCounter').hide();
+}
 
 function renderQuestion(text) {
   $("#questionShell").show();
@@ -259,17 +267,85 @@ function showIntermission(game) {
     $('#intermission').css({'display': 'none'}).html('<embed src="'+game.source+'">');
   }
   else if (/\.((mov)|(mp4))$/i.test(game.source)) {
-    $('#intermission').css({'display': 'none'}).html('<video autoplay src="'+game.source+'">');
+    $('#intermission').css({'display': 'none'}).html('<video autoplay' + (game.loop ? ' loop muted' : '') + ' src="'+game.source+'">');
+    if(game.loop && $('#intermission video').length) {
+      //$('#intermission video')[0].play();
+    }
   }
 
   if(game.text) {
-    $('#intermission').data('sizefactor', '0.3');
-    $('#intermission').html('<span>'+game.text+'</span>').dynasize();
+    $('#intermission').data('sizefactor', game.sizefactor || '0.3');
+    $('#intermission').append('<span style="position: absolute; z-index: 2; top: 0;">'+game.text+'</span>').dynasize();
+    if(game.style) {
+      $('#intermission span').css(game.style);
+    }
   }
 
   $('#intermission').velocity('transition.slideRightIn', 500);
 }
 
+function showWhatIsThis(game) {
+  animTimer = game.timer;
+  zoomLevel = game.zoom;
+
+  // Update section display
+  $("section").fadeOut(CONFIG.transitionDuration);
+  $('#intermission').empty().css('background-image', '');
+
+  // Update controls
+  $("#controls button").not("#openMenu").hide();
+
+  if (/\.((png)|(jpg)|(jpeg)|(gif)|(svg))$/i.test(game.source)) {
+    $('#intermission').css({'background-image': 'url('+game.source+')',
+                            'display': 'none'});
+  }
+  else if (/\.((swf)|(flv))$/i.test(game.source)) {
+    $('#intermission').css({'display': 'none'}).html('<embed src="'+game.source+'">');
+  }
+  else if (/\.((mov)|(mp4))$/i.test(game.source)) {
+    $('#intermission').css({'display': 'none'}).html('<video autoplay' + (game.loop ? ' loop muted' : '') + ' src="'+game.source+'">');
+    if(game.loop && $('#intermission video').length) {
+      //$('#intermission video')[0].play();
+    }
+  }
+
+  if(game.text) {
+    $('#intermission').data('sizefactor', game.sizefactor || '0.3');
+    $('#intermission').append('<span style="position: absolute; z-index: 2; top: 0;">'+game.text+'</span>').dynasize();
+    if(game.style) {
+      $('#intermission span').css(game.style);
+    }
+  }
+
+  //$('#intermission').velocity('transition.slideRightIn', 500);
+}
+
+function startTransition(game) {
+  $('#intermission').css('transform', 'scale(' + zoomLevel + ')');
+  $('#intermission').show().velocity({
+    scale: [1, zoomLevel]
+  }, {
+    easing: 'easeOut',
+    duration: animTimer,
+    progress: function(elements, complete, remaining, start, tweenValue) {
+      animTimer = remaining;
+      zoomLevel = tweenValue;
+    },
+    complete: function() {
+      animTimer = game.timer;
+      sendCommand('transitionComplete');
+    }
+  });
+}
+
+function transitionComplete() {
+  $('#startTransition').show();
+  $('#stopTransition').hide();
+}
+
+function stopTransition() {
+  $('#intermission').velocity("stop");
+}
 
 function buildFinalTrivia(game){
     // Pause any skipped intermissions

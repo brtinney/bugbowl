@@ -28,6 +28,14 @@ $(function(){
 
   }
 
+  function validateWhatIsThis(game) {
+    if (!game.source) errors.push(game.name + ' missing source')
+    if (!game.answer) errors.push(game.name + ' missing answer')
+    if (!game.zoom && game.zoom !== 0) errors.push(game.name + ' missing zoom')
+    if (!game.timer && game.timer !== 0) errors.push(game.name + ' missing timer')
+    verifyAsset(game.source, game);
+  }
+
   function validateFinalTrivia(game) {
 
   }
@@ -61,6 +69,7 @@ $(function(){
     if (GAMES[i].type == "rebus") validateRebus(GAMES[i]);
     else if (GAMES[i].type == "intermission") validateIntermission(GAMES[i]);
     else if (GAMES[i].type == "categories") validateCategories(GAMES[i]);
+    else if (GAMES[i].type == "what_is_this") validateWhatIsThis(GAMES[i]);
     else if (GAMES[i].type == "final_trivia") validateFinalTrivia(GAMES[i]);
     else if (GAMES[i].type == "closing") validateClosing(GAMES[i]);
     else errors.push('Unknown game type defined: ' + GAMES[i].type);

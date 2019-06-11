@@ -500,3 +500,7 @@ section#finalTrivia #finalTriviaTitle, section#finalTrivia #lightningTitle {
 	cursor:pointer;
 	font-weight:bold;
 }
+sup {
+	font-size: .5em;
+	vertical-align: top;
+}

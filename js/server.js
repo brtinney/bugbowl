@@ -87,7 +87,7 @@ var GameState = (function() {
     delete _ACTIVE_GAME.active_cell;
 
     this.setGames(_GAMES); // Pass by reference will include changes
-    $("#next-round").show();
+    $("#next-round").css('display', '');
   }
 
   GameState.prototype.getGame = function(index) {
@@ -180,8 +180,24 @@ function sendCommand(cmd, data) {
   clientScreen.postMessage({cmd: cmd, content: data}, "*")
 }
 
+function receiveCommand(event)
+{
+  var cmd = event.data.cmd;
+  if (cmd == "transitionComplete") {
+    transitionComplete();
+    return;
+  }
+  // if (window[cmd]) {
+  //   window[cmd](event.data.content)
+  // }
+}
+
+window.addEventListener("message", receiveCommand, false);
+
 function runGame(index) {
   var game = gameState.getGame(index);
+
+  sendCommand('run');
 
   if (game.type == 'rebus') {
     game = gameState.prepareGame(index);
@@ -194,8 +210,7 @@ function runGame(index) {
       sendCommand('showScores', false);
     }
     sendCommand('sizeStaticElements');
-    $('#timeout').hide();
-    $('#doubleCounter').hide();
+
   }
 
   else if (game.type == 'categories') {
@@ -212,21 +227,21 @@ function runGame(index) {
 
   else if (game.type == 'intermission') {
     sendCommand('showIntermission', game);
-    $('#timeout').hide();
-    $('#doubleCounter').hide();
+  }
+
+  else if (game.type == 'what_is_this') {
+    sendCommand('showWhatIsThis', game);
+    $("#solution").show().text(game.answer);
+    $("#startTransition").show();
   }
 
   else if (game.type == 'final_trivia') {
     sendCommand('buildFinalTrivia', game)
-    $('#timeout').hide();
-    $('#doubleCounter').hide();
     $("#next-round").hide(); // Want to use the Reveal/Start/Lightning controls instead
   }
 
   else if (game.type == 'closing') {
     sendCommand('showClosing', gameState.getPoints());
-    $('#timeout').hide();
-    $('#doubleCounter').hide();
   }
 
   else {
@@ -258,7 +273,10 @@ function initialize() {
           else if(v.type == 'categories') {
                   v.blocks = Array(v.board.length).fill(Array(v.pointValues.length).fill({}));
                   v.indices = Array(v.board.length).fill(0);
-                  v.double_points = -1; //Math.floor(Math.random() * (v.board.length * v.pointValues.length));
+                  v.double_points = -1;
+                  if(v.scoring !== false) {
+                    v.double_points = Math.floor(Math.random() * (v.board.length * v.pointValues.length));
+                  }
                   v.index = 0;
           }
   });
@@ -455,14 +473,14 @@ function closeModal() {
 
 function updateDoubleCounter(game) {
   var d = (parseInt(game.double_points) + 1) - parseInt(game.index);
-  if(d <= 0) {
+  if(!d || d <= 0) {
     $('#doubleCounter').hide();
   }
   else if(d > 1) {
-    $('#doubleCounter').html('Double Points in <strong>'+d+'</strong> questions').show();
+    $('#doubleCounter').html('Double Points in <strong>'+d+'</strong> questions').css('display', 'inline');
   }
   else {
-    $('#doubleCounter').html('Double Points <strong>next question</strong>').show();
+    $('#doubleCounter').html('Double Points <strong>next question</strong>').css('display', 'inline');
   }
 }
 
@@ -646,9 +664,22 @@ $(function() {
       finalSong.play();
       $("#scoresAlert").show();
       showModal();
-      $("#next-round").show();
+      $("#next-round").css('display', '');
     });
 
+    // What is this?
+    $('#startTransition').on('click', function(e) {
+      var game = GAMES[gameState.getRound()];
+      $('#startTransition').hide();
+      $('#stopTransition').show();
+      sendCommand('startTransition', game);
+    });
+
+    $('#stopTransition').on('click', function(e) {
+      $('#startTransition').show();
+      $('#stopTransition').hide();
+      sendCommand('stopTransition');
+    });
 
     $('#timeout').on('click', function() {
       clearTimeout(timer);

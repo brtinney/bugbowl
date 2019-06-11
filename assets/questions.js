@@ -3,7 +3,7 @@ var rebus_reveal = [
 	 	"answer":		"answer"},
 	{	"question":		"question",
 		"answer":		"answer"}
-]; // Randomly chosen from large list
+]; // Sequentially chosen from large list
 
 var point_value = [
 	{
