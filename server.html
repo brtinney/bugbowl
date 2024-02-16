@@ -1,107 +1,135 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="utf-8">
-        <meta http-equiv="x-ua-compatible" content="ie=edge">
-        <title>BugBowl</title>
-        <meta name="description" content="">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel="stylesheet" href="css/reset.css" type="text/css">
-        <link rel="stylesheet" href="css/bugbowl.css" type="text/css">
-    </head>
-    <body>
-        <section id="audience" data-sizefactor="0.8" class="autosize">
-          <span>Audience Participation</span>
-        </section>
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="x-ua-compatible" content="ie=edge" />
+    <title>BugBowl</title>
+    <meta name="description" content="" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="css/reset.css" type="text/css" />
+    <link rel="stylesheet" href="css/bugbowl.css" type="text/css" />
+  </head>
+  <body>
+    <section id="audience" data-sizefactor="0.8" class="autosize">
+      <span>Audience Participation</span>
+    </section>
 
-        <section id="questionShell" class="admin blurrable">
-          <div id="questionDisplay" class="autosize" data-sizefactor="0.7"></div>
-          <div id="answerDisplay" class="autosize" data-sizefactor="0.7"></div>
-        </section>
+    <section id="questionShell" class="admin blurrable">
+      <div id="questionDisplay" class="autosize" data-sizefactor="0.7"></div>
+      <div id="answerDisplay" class="autosize" data-sizefactor="0.7"></div>
+    </section>
 
-        <section id="doublePoints" class="autosize">
-          <img src="assets/black-widow.png" style="display: block; width: 300px; position: absolute; left: 5%; top: 10%;">
-          <span>DOUBLE POINTS</span>
-          <img src="assets/black-widow.png" style="display: block; width: 300px; position: absolute; right: 5%; top: 10%;">
-        </section>
+    <section id="doublePoints" class="autosize">
+      <img
+        src="assets/black-widow.png"
+        style="
+          display: block;
+          width: 300px;
+          position: absolute;
+          left: 5%;
+          top: 10%;
+        "
+      />
+      <span>DOUBLE POINTS</span>
+      <img
+        src="assets/black-widow.png"
+        style="
+          display: block;
+          width: 300px;
+          position: absolute;
+          right: 5%;
+          top: 10%;
+        "
+      />
+    </section>
 
-        <section id="rebus" class="admin blurrable"></section>
-        <section id="scores" class="admin blurrable"></section>
-        <section id="categories" class="admin blurrable"></section>
-        <!--<section id="intermission"></section>-->
+    <section id="rebus" class="admin blurrable"></section>
+    <section id="scores" class="admin blurrable"></section>
+    <section id="categories" class="admin blurrable"></section>
+    <!--<section id="intermission"></section>-->
 
-        <section id="finalTrivia" class="blurrable">
-          <h1 id="finalTriviaTitle" class="title autosize" data-sizefactor="0.6"></h1>
-          <div id="finalTriviaQuestion" class="autosize" data-sizefactor="0.8"></div>
-          <input type="text" value="" id="finalTimer" class="dial">
-          <h1 id="lightningTitle" class="title autosize" data-sizefactor="0.6"></h1>
-          <div id="lightningQuestion" class="autosize" data-sizefactor="0.8"></div>
-        </section>
+    <section id="finalTrivia" class="blurrable">
+      <h1
+        id="finalTriviaTitle"
+        class="title autosize"
+        data-sizefactor="0.6"
+      ></h1>
+      <div
+        id="finalTriviaQuestion"
+        class="autosize"
+        data-sizefactor="0.8"
+      ></div>
+      <input type="text" value="" id="finalTimer" class="dial" />
+      <h1 id="lightningTitle" class="title autosize" data-sizefactor="0.6"></h1>
+      <div id="lightningQuestion" class="autosize" data-sizefactor="0.8"></div>
+    </section>
 
-        <section id="final">
-          <div id="finalScores"></div>
-          <canvas id="fireworks"></canvas>
-        </section>
+    <section id="final">
+      <div id="finalScores"></div>
+      <canvas id="fireworks"></canvas>
+    </section>
 
+    <div id="controls">
+      <div id="solution">Solution here</div>
+      <button id="openMenu">MENU</button>
+      <button id="clearRebus">Clear Rebus</button>
+      <button id="clearQuestion" style="display: none">Clear Question</button>
+      <button id="correct">&check; Correct</button>
+      <button id="incorrect">&cross; Incorrect</button>
 
-        <div id="controls">
-          <div id="solution">Solution here</div>
-          <button id="openMenu">MENU</button>
-          <button id="clearRebus">Clear Rebus</button>
-          <button id="clearQuestion" style="display: none;">Clear Question</button>
-          <button id="correct">&check; Correct</button>
-          <button id="incorrect">&cross; Incorrect</button>
+      <!-- Final Trivia Controls -->
+      <button id="revealTrivia">Reveal Question</button>
+      <button id="startFinalTimer">Start Timer</button>
+      <button id="revealLightning">Lightning Round</button>
 
-          <!-- Final Trivia Controls -->
-          <button id="revealTrivia">Reveal Question</button>
-          <button id="startFinalTimer">Start Timer</button>
-          <button id="revealLightning">Lightning Round</button>
+      <!-- What is this? Controls -->
+      <button id="startTransition">Start</button>
+      <button id="stopTransition">Pause</button>
 
-          <!-- What is this? Controls -->
-          <button id="startTransition">Start</button>
-          <button id="stopTransition">Pause</button>
+      <button id="timesup">Times Up</button>
 
+      <span id="doubleCounter"></span>
+      <span id="next-round">&raquo;</span>
+      <div id="timeout" class="clearfix">
+        <input id="timeout-input" type="text" value="0" />
+      </div>
+    </div>
 
-          <button id="timesup">Times Up</button>
+    <div id="overlay">
+      <div id="scoreModal" class="modal">
+        <h1>Game Menu</h1>
+        <div id="scoresAlert">Update the scores from Final Trivia</div>
+        <table id="updateScores">
+          <tr id="scores_names"></tr>
+          <tr id="scores_values"></tr>
+          <tr id="scores_wagers"></tr>
+          <tr id="scores_actions"></tr>
+        </table>
+        <button id="overrideScores">Override Scores</button>
+        <hr />
+        Change board:
+        <select id="rounds"></select>
+        <hr />
+        <button id="destroyState">Destroy Saved Data</button>
+        <hr />
+        Keyboard Shortcuts:
+        <ul>
+          <li><span class="keytag">1-3</span>: Select team</li>
+          <li><span class="keytag">ESC</span>: incorrect</li>
+          <li><span class="keytag">Enter</span>: correct</li>
+          <li><span class="keytag">n</span>: next team</li>
+        </ul>
+      </div>
+    </div>
 
-          <span id="doubleCounter"></span>
-          <span id="next-round">&raquo;</span>
-          <div id="timeout" class="clearfix"><input id="timeout-input" type="text" value="0"></div>
-        </div>
-
-        <div id="overlay">
-          <div id="scoreModal" class="modal">
-            <h1>Game Menu</h1>
-            <div id="scoresAlert">Update the scores from Final Trivia</div>
-            <table id="updateScores">
-              <tr id="scores_names"></tr>
-              <tr id="scores_values"></tr>
-              <tr id="scores_wagers"></tr>
-              <tr id="scores_actions"></tr>
-            </table>
-            <button id="overrideScores">Override Scores</button>
-            <hr />
-            Change board: <select id="rounds"></select>
-            <hr />
-            <button id="destroyState">Destroy Saved Data</button>
-            <hr />
-            Keyboard Shortcuts:
-            <ul>
-              <li><span class="keytag">1-3</span>: Select team</li>
-              <li><span class="keytag">ESC</span>: incorrect</li>
-              <li><span class="keytag">Enter</span>: correct</li>
-              <li><span class="keytag">n</span>: next team</li>
-            </ul>
-          </div>
-        </div>
-
-        <script src="js/jquery-2.1.4.min.js"></script>
-        <script src="js/jquery.dynasize.js"></script>
-        <script src="js/jquery.knob.min.js"></script>
-        <script src="js/velocity.min.js"></script>
-        <script src="assets/questions.js"></script>
-        <script src="js/validation.js"></script> <!-- required before server.js -->
-        <script src="js/server.js"></script>
-        <script src="js/common.js"></script>
-    </body>
+    <script src="js/jquery-2.1.4.min.js"></script>
+    <script src="js/jquery.dynasize.js"></script>
+    <script src="js/jquery.knob.min.js"></script>
+    <script src="js/velocity.min.js"></script>
+    <script src="assets/questions.js"></script>
+    <script src="js/validation.js"></script>
+    <!-- required before server.js -->
+    <script src="js/server.js"></script>
+    <script src="js/common.js"></script>
+  </body>
 </html>
