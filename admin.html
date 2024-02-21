@@ -20,6 +20,7 @@
       }
       td {
         border: 1px solid #000;
+        background: #fff;
       }
       td,
       th {
@@ -27,10 +28,23 @@
       }
       td.num,
       td.points {
-        background: #eee;
+        background: #ddd;
       }
       .page {
         page-break-after: always;
+        padding: 0rem 2rem 2rem;
+        margin: 2rem;
+        background: #f3f3f3;
+        border: 1px solid #999;
+        border-radius: 0.5rem;
+        position: relative;
+      }
+      .remove-round {
+        display: block;
+        text-align: right;
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
       }
       h3 {
         text-align: center;
@@ -58,7 +72,81 @@
         width: 100%;
       }
 
-      button {
+      .del {
+        background: initial;
+        background-position: 0 0;
+        color: #ff4742;
+        border: 1px solid #ff4742;
+        border-radius: 6px;
+        box-shadow: rgba(0, 0, 0, 0.1) 1px 2px 4px;
+        box-sizing: border-box;
+        cursor: pointer;
+        display: inline-block;
+        font-family: nunito, roboto, proxima-nova, 'proxima nova', sans-serif;
+        font-weight: 800;
+        outline: 0;
+        padding: 6px 9px;
+        text-align: center;
+        text-rendering: geometricprecision;
+        text-transform: none;
+        user-select: none;
+        -webkit-user-select: none;
+        touch-action: manipulation;
+        vertical-align: middle;
+      }
+
+      .del:hover,
+      .del:active {
+        background: #ff4742;
+        color: #ffffff;
+      }
+
+      .del:active {
+        opacity: 0.5;
+      }
+
+      .add {
+        margin: 0.5rem 0;
+        background: initial;
+        background-position: 0 0;
+        color: #35c65e;
+        border: 1px solid #35c65e;
+        border-radius: 6px;
+        box-shadow: rgba(0, 0, 0, 0.1) 1px 2px 4px;
+        box-sizing: border-box;
+        cursor: pointer;
+        display: inline-block;
+        font-family: nunito, roboto, proxima-nova, 'proxima nova', sans-serif;
+        font-weight: 800;
+        outline: 0;
+        padding: 6px 9px;
+        text-align: center;
+        text-rendering: geometricprecision;
+        text-transform: none;
+        user-select: none;
+        -webkit-user-select: none;
+        touch-action: manipulation;
+        vertical-align: middle;
+      }
+
+      .add:hover,
+      .add:active {
+        background: #35c65e;
+        color: #ffffff;
+      }
+
+      .add:active {
+        opacity: 0.5;
+      }
+
+      #save {
+        margin: 3rem 0;
+        padding: 0 2rem;
+        display: flex;
+        justify-content: center;
+      }
+
+      .save {
         appearance: none;
         background-color: #2ea44f;
         border: 1px solid rgba(27, 31, 35, 0.15);
@@ -85,28 +173,28 @@
         width: 100%;
       }
 
-      button:focus:not(:focus-visible):not(.focus-visible) {
+      .save:focus:not(:focus-visible):not(.focus-visible) {
         box-shadow: none;
         outline: none;
       }
 
-      button:hover {
+      .save:hover {
         background-color: #2c974b;
       }
 
-      button:focus {
+      .save:focus {
         box-shadow: rgba(46, 164, 79, 0.4) 0 0 0 3px;
         outline: none;
       }
 
-      button:disabled {
+      .save:disabled {
         background-color: #94d3a2;
         border-color: rgba(27, 31, 35, 0.1);
         color: rgba(255, 255, 255, 0.8);
         cursor: default;
       }
 
-      button:active {
+      .save:active {
         background-color: #298e46;
         box-shadow: rgba(20, 70, 32, 0.2) 0 1px 0 inset;
       }
@@ -177,6 +265,7 @@
         <table>
           <thead>
             <tr>
+              <th class="points" style="width: 1.6rem"></th>
               <th class="num">No.</th>
               <th class="question">Question</th>
               <th class="answer">Answer</th>
@@ -185,7 +274,9 @@
           <tbody>
           `
       $.each(questions, function (i, v) {
-        out += '<tr>'
+        out += '<tr class="rebus-question">'
+        out +=
+          '<td class="points" style="width: 1.6rem"><button class="del" role="button">&times;</button></td>'
         out += '<td class="num">' + (i + 1) + '</td>'
         out += `<td class="question"><div><input type="text" value="${escapeHtml(
           v.question
@@ -196,6 +287,9 @@
         out += '</tr>'
       })
       out += `
+            <tr id="add-rebus">
+              <td colspan="4"><button class="add" role="button">Add Question</button></td>
+            </tr>
           </tbody>
         </table>
       </div>
@@ -203,14 +297,16 @@
 
       out += '<h2 style="text-align: center">BugBowl Game Order</h2>'
 
-      var rround = 0
-      var cround = 0
-      $.each(GAMES, function (i, v) {
+      out += '<div id="rounds">'
+
+      function renderRound(v) {
+        let output = ''
         if (v.type == 'categories' && typeof v.pointValues[0] != 'number') {
           // Audience Rounds
-          out += `
-              <div class="page" id="round-${i}">
-                <h3>BugBowl Audience Round</h3>
+          output += `
+              <div class="page" data-type="audience">
+                <h3>${v.name}</h3>
+                <button class="remove-round del" role="button">Remove Round</button>
                 <table>
                   <thead>
                     <tr>
@@ -222,33 +318,34 @@
                   <tbody>
               `
           $.each(v.board, function (j, w) {
-            out += '<tr>'
-            out += `<td class="category" colspan="3"><div><input type="text" value="${escapeHtml(
+            output += '<tr>'
+            output += `<td class="category" colspan="3"><div><input type="text" value="${escapeHtml(
               w.category
             )}" /></div></td>`
-            out += '</tr>'
+            output += '</tr>'
             $.each(w.questions, function (k, x) {
-              out += `<tr class="cat-${i}-${j}">`
-              out += '<td class="points">' + (k + 1) + '</td>'
-              out += `<td class="c-question"><div><input type="text" value="${escapeHtml(
+              output += `<tr class="cat-${j}">`
+              output += '<td class="points">' + (k + 1) + '</td>'
+              output += `<td class="c-question"><div><input type="text" value="${escapeHtml(
                 x.question
               )}" /></div></td>`
-              out += `<td class="c-answer"><div><input type="text" value="${escapeHtml(
+              output += `<td class="c-answer"><div><input type="text" value="${escapeHtml(
                 x.answer
               )}" /></div></td>`
-              out += '</tr>'
+              output += '</tr>'
             })
           })
-          out += `
+          output += `
                   </tbody>
                 </table>
               </div>
               `
         } else if (v.type == 'categories') {
           // Category Rounds
-          out += `
-            <div class="page" id="round-${i}">
+          output += `
+            <div class="page" data-type="categories">
               <h3>${v.name}</h3>
+              <button class="remove-round del" role="button">Remove Round</button>
                 <table>
                   <thead>
                     <tr>
@@ -260,33 +357,34 @@
                   <tbody>
               `
           $.each(v.board, function (j, w) {
-            out += '<tr>'
-            out += `<td class="category" colspan="3"><div><input type="text" value="${escapeHtml(
+            output += '<tr>'
+            output += `<td class="category" colspan="3"><div><input type="text" value="${escapeHtml(
               w.category
             )}" /></div></td>`
-            out += '</tr>'
+            output += '</tr>'
             $.each(w.questions, function (k, x) {
-              out += `<tr class="cat-${i}-${j}">`
-              out += '<td class="points">' + v.pointValues[k] + '</td>'
-              out += `<td class="c-question"><div><input type="text" value="${escapeHtml(
+              output += `<tr class="cat-${j}">`
+              output += '<td class="points">' + v.pointValues[k] + '</td>'
+              output += `<td class="c-question"><div><input type="text" value="${escapeHtml(
                 x.question
               )}" /></div></td>`
-              out += `<td class="c-answer"><div><input type="text" value="${escapeHtml(
+              output += `<td class="c-answer"><div><input type="text" value="${escapeHtml(
                 x.answer
               )}" /></div></td>`
-              out += '</tr>'
+              output += '</tr>'
             })
           })
-          out += `
+          output += `
                   </tbody>
                 </table>
               </div>
               `
         } else if (v.type == 'rebus') {
           // Rebus Rounds
-          out += `
-            <div class="page" id="round-${i}">
+          output += `
+            <div class="page" data-type="rebus">
               <h3>${v.name}</h3>
+              <button class="remove-round del" role="button">Remove Round</button>
               <table>
                 <thead>
                   <tr>
@@ -296,23 +394,24 @@
                 </thead>
                 <tbody>
                 `
-          out += '<tr>'
-          out += `<td class="question"><div><input type="text" value="${escapeHtml(
+          output += '<tr>'
+          output += `<td class="question"><div><input type="text" value="${escapeHtml(
             v.image
           )}" /></div></td>`
-          out += `<td class="answer"><div><input type="text" value="${escapeHtml(
+          output += `<td class="answer"><div><input type="text" value="${escapeHtml(
             v.solution
           )}" /></div></td>`
-          out += '</tr>'
-          out += `
+          output += '</tr>'
+          output += `
                 </tbody>
               </table>
             </div>`
         } else if (v.type == 'intermission') {
           // Rebus Rounds
-          out += `
-            <div class="page" id="round-${i}">
+          output += `
+            <div class="page" data-type="intermission">
               <h3>${v.name}</h3>
+              <button class="remove-round del" role="button">Remove Round</button>
               <table>
                 <thead>
                   <tr>
@@ -321,33 +420,41 @@
                 </thead>
                 <tbody>
                 `
-          out += '<tr>'
-          out += `<td class="question"><div><input type="text" value="${escapeHtml(
+          output += '<tr>'
+          output += `<td class="question"><div><input type="text" value="${escapeHtml(
             v.source
           )}" /></div></td>`
-          out += '</tr>'
-          out += `
+          output += '</tr>'
+          output += `
                 </tbody>
               </table>
             </div>`
         }
-      })
 
-      /*$.each(audience_questions, function(i, v) {
-            out += '<tr>';
-            out += '<td class="num">'+(i+1)+'</td>';
-            out += '<td class="question">'+v.question+'</td>';
-            out += '<td class="answer">'+v.answer+'</td>';
-            out += '</tr>';
-          });
-          out += '\
-              </tbody>\
-            </table>\
-          </div>\
-          ';*/
+        return output
+      }
+
+      $.each(GAMES, (i, v) => (out += renderRound(v)))
+
+      out += '</div>' // rounds
+
+      out += `
+        <div class="page" style="padding: 1rem 1.5rem;" id="add-round">
+          <div style="display: flex;">
+            <select id="add-type" style="margin-right: .5rem">
+              <option value="intermission">Intermission (Video/Image)</option>
+              <option value="rebus">Rebus Round</option>
+              <option value="audience">Audience Round</option>
+              <option value="categories">Category Round</option>
+            </select>
+            <input type="text" id="add-name" value="" placeholder="Round Name" style="margin-right: .5rem" />
+            <button class="add" role="button">Add Round</button>
+          </div>
+        </div>
+      `
 
       out +=
-        '<div style="margin: 3rem 0; padding: 0 5rem; display: flex; justify-content: center;"><button role="button">Save</button></div>'
+        '<div id="save"><button class="save" role="button">Save</button></div>'
       $('body').append(out)
 
       function download(filename, text) {
@@ -366,7 +473,97 @@
         document.body.removeChild(element)
       }
 
-      $('button').on('click', async function (e) {
+      $('body').on('click', '.rebus-question .del', function (e) {
+        e.preventDefault()
+        $(this).closest('tr').remove()
+        $('#questions tr td.num').each(function (i, e) {
+          $(e).text(i + 1)
+        })
+      })
+
+      $('body').on('click', '.remove-round', function (e) {
+        e.preventDefault()
+        $(this).closest('.page').remove()
+      })
+
+      $('body').on('click', '#add-rebus button', function (e) {
+        e.preventDefault()
+        let o = ''
+        o += '<tr>'
+        o +=
+          '<td class="points" style="width: 1.6rem"><button class="del" role="button">&times;</button></td>'
+        o +=
+          '<td class="num">' + ($('#questions tr td.num').length + 1) + '</td>'
+        o += `<td class="question"><div><input type="text" value="" /></div></td>`
+        o += `<td class="answer"><div><input type="text" value="" /></div></td>`
+        o += '</tr>'
+        $('#questions tbody').append(o)
+        $('#questions #add-rebus').appendTo('#questions tbody')
+      })
+
+      $('body').on('click', '#add-round button', function (e) {
+        e.preventDefault()
+        let name = $('#add-name').val()
+        let type = $('#add-type').val()
+        let pointValues = [100, 200, 300, 500]
+        if (type === 'audience') {
+          type = 'categories'
+          pointValues = ['☆', '☆', '☆', '☆']
+        }
+
+        $('#rounds').append(
+          renderRound({
+            name,
+            type,
+            source: '',
+            image: '',
+            solution: '',
+            pointValues,
+            board: [
+              {
+                category: 'Topic 1',
+                questions: [
+                  { question: '', answer: '' },
+                  { question: '', answer: '' },
+                  { question: '', answer: '' },
+                  { question: '', answer: '' }
+                ]
+              },
+              {
+                category: 'Topic 2',
+                questions: [
+                  { question: '', answer: '' },
+                  { question: '', answer: '' },
+                  { question: '', answer: '' },
+                  { question: '', answer: '' }
+                ]
+              },
+              {
+                category: 'Topic 3',
+                questions: [
+                  { question: '', answer: '' },
+                  { question: '', answer: '' },
+                  { question: '', answer: '' },
+                  { question: '', answer: '' }
+                ]
+              },
+              {
+                category: 'Topic 4',
+                questions: [
+                  { question: '', answer: '' },
+                  { question: '', answer: '' },
+                  { question: '', answer: '' },
+                  { question: '', answer: '' }
+                ]
+              }
+            ]
+          })
+        )
+      })
+
+      // TODO: jQuery drag/drop re-order
+
+      $('.save').on('click', async function (e) {
         e.preventDefault()
 
         YEAR = $('#year input').val() || YEAR
@@ -380,27 +577,65 @@
           }))
           .toArray()
 
-        for (const i in GAMES) {
-          const v = GAMES[i]
-          if (v.type == 'categories') {
-            v.board = $(`#round-${i} .category input`)
-              .map((j, e) => ({
-                category: $(e).val(),
-                questions: $(`#round-${i} .cat-${i}-${j} .c-question input`)
-                  .map((k, e) => ({
-                    question: $(e).val(),
-                    answer: $(e).closest('tr').find('.c-answer input').val()
+        GAMES = $('#rounds .page')
+          .map((i, e) => {
+            if ($(e).data('type') == 'audience') {
+              return {
+                name: $(e).find('h3').text(),
+                type: 'categories',
+                pointValues: ['☆', '☆', '☆', '☆'],
+                board: $(e)
+                  .find('.category input')
+                  .map((j, f) => ({
+                    category: $(f).val(),
+                    questions: $(e)
+                      .find(`.cat-${j} .c-question input`)
+                      .map((k, g) => ({
+                        question: $(g).val(),
+                        answer: $(g).closest('tr').find('.c-answer input').val()
+                      }))
+                      .toArray()
                   }))
                   .toArray()
-              }))
-              .toArray()
-          } else if (v.type == 'rebus') {
-            v.image = $(`#round-${i} .question input`).val()
-            v.solution = $(`#round-${i} .answer input`).val()
-          } else if (v.type == 'intermission') {
-            v.source = $(`#round-${i} input`).val()
-          }
-        }
+              }
+            } else if ($(e).data('type') == 'categories') {
+              return {
+                name: $(e).find('h3').text(),
+                type: 'categories',
+                pointValues: [100, 200, 300, 500],
+                board: $(e)
+                  .find('.category input')
+                  .map((j, f) => ({
+                    category: $(f).val(),
+                    questions: $(e)
+                      .find(`.cat-${j} .c-question input`)
+                      .map((k, g) => ({
+                        question: $(g).val(),
+                        answer: $(g).closest('tr').find('.c-answer input').val()
+                      }))
+                      .toArray()
+                  }))
+                  .toArray()
+              }
+            } else if ($(e).data('type') == 'rebus') {
+              return {
+                name: $(e).find('h3').text(),
+                type: 'rebus',
+                image: $(e).find('.question input').val(),
+                solution: $(e).find('.question input').val(),
+                questions: '{REPLACE}',
+                points: 100,
+                boardClearPoints: 500
+              }
+            } else if ($(e).data('type') == 'intermission') {
+              return {
+                name: $(e).find('h3').text(),
+                type: 'intermission',
+                source: $(e).find('input').val()
+              }
+            }
+          })
+          .toArray()
 
         download(
           'questions.js',
@@ -412,7 +647,7 @@ var questions = ${JSON.stringify(questions, null, 2)}
 
 var GAMES = ${JSON.stringify(GAMES, null, 2)}
 
-        `
+        `.replace(/"\{REPLACE\}"/g, 'questions')
         )
       })
     </script>
