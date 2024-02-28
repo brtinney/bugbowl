@@ -37,6 +37,11 @@ var GAMES = [
     source: 'assets/video1.swf'
   },
   {
+    name: 'Audience Participation',
+    type: 'text',
+    text: 'Audience Participation'
+  },
+  {
     name: 'Audience Round',
     type: 'categories',
     pointValues: ['☆', '☆', '☆', '☆'],
@@ -207,6 +212,10 @@ var GAMES = [
         ]
       }
     ]
+  },
+  {
+    name: 'Closing',
+    type: 'closing'
   }
 ]
 

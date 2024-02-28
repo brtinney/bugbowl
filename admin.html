@@ -40,8 +40,8 @@
         position: relative;
       }
       .remove-round {
-        display: block;
-        text-align: right;
+        display: flex;
+        justify-content: end;
         position: absolute;
         top: 1rem;
         right: 1rem;
@@ -72,11 +72,12 @@
         width: 100%;
       }
 
-      .del {
+      .del,
+      .remove-round button {
         background: initial;
         background-position: 0 0;
-        color: #ff4742;
-        border: 1px solid #ff4742;
+        color: #999;
+        border: 1px solid #999;
         border-radius: 6px;
         box-shadow: rgba(0, 0, 0, 0.1) 1px 2px 4px;
         box-sizing: border-box;
@@ -93,16 +94,34 @@
         -webkit-user-select: none;
         touch-action: manipulation;
         vertical-align: middle;
+        margin: 0 3px;
       }
 
       .del:hover,
-      .del:active {
-        background: #ff4742;
+      .del:active,
+      .remove-round button:hover,
+      .remove-round button:active {
+        background: #999;
         color: #ffffff;
       }
 
-      .del:active {
+      .del:active,
+      .remove-round button:active {
         opacity: 0.5;
+      }
+
+      .del,
+      .remove-round button.del {
+        color: #ff4742;
+        border: 1px solid #ff4742;
+      }
+
+      .del:hover,
+      .del:active,
+      .remove-round button.del:hover,
+      .remove-round button.del:active {
+        background: #ff4742;
+        color: #ffffff;
       }
 
       .add {
@@ -306,7 +325,11 @@
           output += `
               <div class="page" data-type="audience">
                 <h3>${v.name}</h3>
-                <button class="remove-round del" role="button">Remove Round</button>
+                <div class="remove-round">
+                  <button class="round-up" role="button">&uarr;</button>
+                  <button class="round-down" role="button">&darr;</button>
+                  <button class="del" role="button">&times;</button>
+                </div>
                 <table>
                   <thead>
                     <tr>
@@ -345,16 +368,20 @@
           output += `
             <div class="page" data-type="categories">
               <h3>${v.name}</h3>
-              <button class="remove-round del" role="button">Remove Round</button>
-                <table>
-                  <thead>
-                    <tr>
-                      <th class="points">Pts.</th>
-                      <th class="c-question">Question</th>
-                      <th class="c-answer">Answer</th>
-                    </tr>
-                  </thead>
-                  <tbody>
+              <div class="remove-round">
+                <button class="round-up" role="button">&uarr;</button>
+                <button class="round-down" role="button">&darr;</button>
+                <button class="del" role="button">&times;</button>
+              </div>
+              <table>
+                <thead>
+                  <tr>
+                    <th class="points">Pts.</th>
+                    <th class="c-question">Question</th>
+                    <th class="c-answer">Answer</th>
+                  </tr>
+                </thead>
+                <tbody>
               `
           $.each(v.board, function (j, w) {
             output += '<tr>'
@@ -375,16 +402,20 @@
             })
           })
           output += `
-                  </tbody>
-                </table>
-              </div>
+                </tbody>
+              </table>
+            </div>
               `
         } else if (v.type == 'rebus') {
           // Rebus Rounds
           output += `
             <div class="page" data-type="rebus">
               <h3>${v.name}</h3>
-              <button class="remove-round del" role="button">Remove Round</button>
+              <div class="remove-round">
+                <button class="round-up" role="button">&uarr;</button>
+                <button class="round-down" role="button">&darr;</button>
+                <button class="del" role="button">&times;</button>
+              </div>
               <table>
                 <thead>
                   <tr>
@@ -407,11 +438,15 @@
               </table>
             </div>`
         } else if (v.type == 'intermission') {
-          // Rebus Rounds
+          // Intermission (Image/Video)
           output += `
             <div class="page" data-type="intermission">
               <h3>${v.name}</h3>
-              <button class="remove-round del" role="button">Remove Round</button>
+              <div class="remove-round">
+                <button class="round-up" role="button">&uarr;</button>
+                <button class="round-down" role="button">&darr;</button>
+                <button class="del" role="button">&times;</button>
+              </div>
               <table>
                 <thead>
                   <tr>
@@ -429,6 +464,44 @@
                 </tbody>
               </table>
             </div>`
+        } else if (v.type == 'text') {
+          // Intermission (Text)
+          output += `
+            <div class="page" data-type="text">
+              <h3>${v.name}</h3>
+              <div class="remove-round">
+                <button class="round-up" role="button">&uarr;</button>
+                <button class="round-down" role="button">&darr;</button>
+                <button class="del" role="button">&times;</button>
+                </div>
+              <table>
+                <thead>
+                  <tr>
+                    <th class="question">Text</th>
+                  </tr>
+                </thead>
+                <tbody>
+                `
+          output += '<tr>'
+          output += `<td class="question"><div><input type="text" value="${escapeHtml(
+            v.text
+          )}" /></div></td>`
+          output += '</tr>'
+          output += `
+                </tbody>
+              </table>
+            </div>`
+        } else if (v.type == 'closing') {
+          // Closing
+          output += `
+            <div class="page" data-type="closing">
+              <h3>${v.name}</h3>
+              <div class="remove-round">
+                <button class="round-up" role="button">&uarr;</button>
+                <button class="round-down" role="button">&darr;</button>
+                <button class="del" role="button">&times;</button>
+              </div>
+            </div>`
         }
 
         return output
@@ -443,9 +516,11 @@
           <div style="display: flex;">
             <select id="add-type" style="margin-right: .5rem">
               <option value="intermission">Intermission (Video/Image)</option>
+              <option value="text">Intermission (Text)</option>
               <option value="rebus">Rebus Round</option>
               <option value="audience">Audience Round</option>
               <option value="categories">Category Round</option>
+              <option value="closing">Closing</option>
             </select>
             <input type="text" id="add-name" value="" placeholder="Round Name" style="margin-right: .5rem" />
             <button class="add" role="button">Add Round</button>
@@ -481,7 +556,17 @@
         })
       })
 
-      $('body').on('click', '.remove-round', function (e) {
+      $('body').on('click', '.remove-round .round-up', function (e) {
+        e.preventDefault()
+        $(this).closest('.page').insertBefore($(this).closest('.page').prev())
+      })
+
+      $('body').on('click', '.remove-round .round-down', function (e) {
+        e.preventDefault()
+        $(this).closest('.page').insertAfter($(this).closest('.page').next())
+      })
+
+      $('body').on('click', '.remove-round .del', function (e) {
         e.preventDefault()
         $(this).closest('.page').remove()
       })
@@ -560,8 +645,6 @@
           })
         )
       })
-
-      // TODO: jQuery drag/drop re-order
 
       $('.save').on('click', async function (e) {
         e.preventDefault()

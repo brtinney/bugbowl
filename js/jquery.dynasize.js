@@ -17,8 +17,8 @@ $.fn.dynasize = function () {
     var el = $(this).children('span')
     var elDisplay = el.css('display') // Capture existing display type
     el.css('display', 'none') // Get bounding box without element
-    var h = Math.trunc($(this).height())
-    var w = Math.trunc($(this).width())
+    var h = Math.trunc($(this)[0].getBoundingClientRect().height)
+    var w = Math.trunc($(this)[0].getBoundingClientRect().width)
 
     el.css('display', 'block')
 
@@ -31,9 +31,15 @@ $.fn.dynasize = function () {
       var mid = Math.trunc((high + low) / 2)
 
       el.css('font-size', mid)
-      // console.log(high, low, rounds, mid, el.height(), h)
-      if (Math.trunc(el.height()) > h || Math.trunc(el.width()) > w) high = mid
-      else if (Math.trunc(el.height()) < h || Math.trunc(el.width()) < w)
+      if (
+        Math.trunc(el[0].getBoundingClientRect().height) > h ||
+        Math.trunc(el[0].getBoundingClientRect().width) > w
+      )
+        high = mid
+      else if (
+        Math.trunc(el[0].getBoundingClientRect().height) < h ||
+        Math.trunc(el[0].getBoundingClientRect().width) < w
+      )
         low = mid + 1
       else break
     }
@@ -42,9 +48,7 @@ $.fn.dynasize = function () {
 
     // Allow
     if ($(this).data('sizefactor')) {
-      //console.log(mid)
       mid = Math.trunc(mid * $(this).data('sizefactor'))
-      //console.log(mid)
       el.css('font-size', mid)
     }
 
