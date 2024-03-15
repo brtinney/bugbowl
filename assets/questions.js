@@ -214,6 +214,18 @@ var GAMES = [
     ]
   },
   {
+    name: 'Final Trivia',
+    type: 'final_trivia',
+    time: 60,
+    question: '<pre>Formatted HTML</pre>',
+    answer: `1
+2
+3`,
+    title: 'Final Category: Category',
+    lightningQuestion: '<pre>SUPER LIGHTNING</pre>',
+    lightningAnswer: 'Not shown, but printed'
+  },
+  {
     name: 'Closing',
     type: 'closing'
   }

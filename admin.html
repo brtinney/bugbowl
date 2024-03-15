@@ -66,10 +66,17 @@
       }
       .question input,
       .answer input,
+      .question textarea,
+      .answer textarea,
       .c-question input,
       .c-answer input,
       .category input {
         width: 100%;
+      }
+
+      .question textarea,
+      .answer textarea {
+        height: 8rem;
       }
 
       .del,
@@ -491,6 +498,50 @@
                 </tbody>
               </table>
             </div>`
+        } else if (v.type == 'final_trivia') {
+          // Final Trivia
+          output += `
+            <div class="page" data-type="final_trivia">
+              <h3>${v.name}</h3>
+              <div class="remove-round">
+                <button class="round-up" role="button">&uarr;</button>
+                <button class="round-down" role="button">&darr;</button>
+                <button class="del" role="button">&times;</button>
+              </div>
+              <table>
+                <thead>
+                  <tr>
+                    <th class="question">Category</th>
+                    <th class="question">Question</th>
+                    <th class="answer">Answer</th>
+                  </tr>
+                </thead>
+                <tbody>
+                `
+          output += '<tr>'
+          output += `<td class="category"><div><input type="text" value="${escapeHtml(
+            v.title.replace('Final Category: ', '')
+          )}" /></div></td>`
+          output += `<td class="question"><div><textarea>${escapeHtml(
+            v.question
+          )}</textarea></div></td>`
+          output += `<td class="answer"><div><textarea>${escapeHtml(
+            v.answer
+          )}</textarea></div></td>`
+          output += '</tr>'
+          output += '<tr>'
+          output += `<td class="category"><div>Lightning Round</div></td>`
+          output += `<td class="question"><div><textarea>${escapeHtml(
+            v.lightningQuestion
+          )}</textarea></div></td>`
+          output += `<td class="answer"><div><textarea>${escapeHtml(
+            v.lightningAnswer
+          )}</textarea></div></td>`
+          output += '</tr>'
+          output += `
+                </tbody>
+              </table>
+            </div>`
         } else if (v.type == 'closing') {
           // Closing
           output += `
@@ -520,6 +571,7 @@
               <option value="rebus">Rebus Round</option>
               <option value="audience">Audience Round</option>
               <option value="categories">Category Round</option>
+              <option value="final_trivia">Final Trivia</option>
               <option value="closing">Closing</option>
             </select>
             <input type="text" id="add-name" value="" placeholder="Round Name" style="margin-right: .5rem" />
@@ -574,7 +626,7 @@
       $('body').on('click', '#add-rebus button', function (e) {
         e.preventDefault()
         let o = ''
-        o += '<tr>'
+        o += '<tr class="rebus-question">'
         o +=
           '<td class="points" style="width: 1.6rem"><button class="del" role="button">&times;</button></td>'
         o +=
@@ -705,7 +757,7 @@
                 name: $(e).find('h3').text(),
                 type: 'rebus',
                 image: $(e).find('.question input').val(),
-                solution: $(e).find('.question input').val(),
+                solution: $(e).find('.answer input').val(),
                 questions: '{REPLACE}',
                 points: 100,
                 boardClearPoints: 500
@@ -715,6 +767,17 @@
                 name: $(e).find('h3').text(),
                 type: 'intermission',
                 source: $(e).find('input').val()
+              }
+            } else if ($(e).data('type') == 'final_trivia') {
+              return {
+                name: $(e).find('h3').text(),
+                type: 'final_trivia',
+                question: $(e).find('.question textarea')[0].val(),
+                answer: $(e).find('.answer textarea')[0].val(),
+                title:
+                  'Final Category: ' + $(e).find('.category input')[0].val(),
+                lightningQuestion: $(e).find('.question textarea')[1].val(),
+                lightningAnswer: $(e).find('.answer textarea')[1].val()
               }
             }
           })

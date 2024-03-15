@@ -487,9 +487,7 @@ function buildFinalTrivia(game) {
     .html('<span>' + game.answer + '</span>')
     .hide()
 
-  $('#lightningTitle')
-    .html('<span>' + game.lightingTitle + '</span>')
-    .hide()
+  $('#lightningTitle').html('<span>Lightning Round</span>').hide()
   $('#lightningQuestion')
     .html('<span>' + game.lightningQuestion + '</span>')
     .hide()

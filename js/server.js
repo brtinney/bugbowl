@@ -259,7 +259,7 @@ function runGame(index) {
     sendCommand('sizeStaticElements')
     $('#timeout').show()
     updateDoubleCounter(game)
-  } else if (game.type == 'intermission') {
+  } else if (game.type == 'intermission' || game.type == 'text') {
     sendCommand('showIntermission', game)
   } else if (game.type == 'what_is_this') {
     sendCommand('showWhatIsThis', game)

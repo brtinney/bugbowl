@@ -98,20 +98,19 @@
     <script src="assets/questions.js"></script>
     <script>
       // Rebus Rounds
-      var out =
-        '\
-          <div class="page">\
-            <h3>BugBowl Rebus Rounds</h3>\
-            <table>\
-              <thead>\
-                <tr>\
-                  <th class="num">No.</th>\
-                  <th class="question">Question</th>\
-                  <th class="answer">Answer</th>\
-                </tr>\
-              </thead>\
-              <tbody>\
-          '
+      var out = `
+          <div class="page">
+            <h3>BugBowl Rebus Round Questions</h3>
+            <table>
+              <thead>
+                <tr>
+                  <th class="num">No.</th>
+                  <th class="question">Question</th>
+                  <th class="answer">Answer</th>
+                </tr>
+              </thead>
+              <tbody>
+          `
       $.each(questions, function (i, v) {
         out += '<tr>'
         out += '<td class="num">' + (i + 1) + '</td>'
@@ -119,32 +118,29 @@
         out += '<td class="answer">' + v.answer + '</td>'
         out += '</tr>'
       })
-      out +=
-        '\
-              </tbody>\
-            </table>\
-          </div>\
-          '
+      out += `
+              </tbody>
+            </table>
+          </div>
+          `
 
-      var round = 0
       $.each(GAMES, function (i, v) {
         if (v.type == 'categories' && typeof v.pointValues[0] != 'number') {
           // Audience Rounds
-          out +=
-            '\
-              <div class="page">\
-                <h3>BugBowl Audience Round</h3>\
-                <table>\
-                  <thead>\
-                    <tr>\
-                      <th class="num">Row</th>\
-                      <th class="category">Category</th>\
-                      <th class="question">Question</th>\
-                      <th class="answer">Answer</th>\
-                    </tr>\
-                  </thead>\
-                  <tbody>\
-              '
+          out += `
+              <div class="page">
+                <h3>${v.name}</h3>
+                <table>
+                  <thead>
+                    <tr>
+                      <th class="num">Row</th>
+                      <th class="category">Category</th>
+                      <th class="question">Question</th>
+                      <th class="answer">Answer</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+              `
           $.each(v.board, function (j, w) {
             $.each(w.questions, function (k, x) {
               out += '<tr>'
@@ -155,32 +151,27 @@
               out += '</tr>'
             })
           })
-          out +=
-            '\
-                  </tbody>\
-                </table>\
-              </div>\
-              '
+          out += `
+                  </tbody>
+                </table>
+              </div>
+              `
         } else if (v.type == 'categories') {
           // Category Rounds
-          round++
-          out +=
-            '\
-              <div class="page">\
-                <h3>BugBowl Category Round ' +
-            round +
-            '</h3>\
-                <table>\
-                  <thead>\
-                    <tr>\
-                      <th class="points">Pts.</th>\
-                      <th class="category">Category</th>\
-                      <th class="c-question">Question</th>\
-                      <th class="c-answer">Answer</th>\
-                    </tr>\
-                  </thead>\
-                  <tbody>\
-              '
+          out += `
+              <div class="page">
+                <h3>${v.name}</h3>
+                <table>
+                  <thead>
+                    <tr>
+                      <th class="points">Pts.</th>
+                      <th class="category">Category</th>
+                      <th class="c-question">Question</th>
+                      <th class="c-answer">Answer</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+              `
           $.each(v.board, function (j, w) {
             $.each(w.questions, function (k, x) {
               out += '<tr>'
@@ -191,12 +182,66 @@
               out += '</tr>'
             })
           })
+          out += `
+                  </tbody>
+                </table>
+              </div>
+              `
+        } else if (v.type == 'rebus') {
+          // Rebus Rounds
+          out += `
+              <div class="page">
+                <h3>${v.name}</h3>
+                <table>
+                  <thead>
+                    <tr>
+                      <th class="question">Solution</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+              `
+          out += '<tr>'
+          out += '<td class="question">' + v.solution + '</td>'
+          out += '</tr>'
+          out += `
+                  </tbody>
+                </table>
+              </div>
+              `
+        } else if (v.type == 'final_trivia') {
+          // Final Trivia
+          out += `
+              <div class="page">
+                <h3>${v.name}</h3>
+                <table>
+                  <thead>
+                    <tr>
+                      <th class="category">Category</th>
+                      <th class="question">Question</th>
+                      <th class="answer">Answer</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+              `
+          out += '<tr>'
           out +=
-            '\
-                  </tbody>\
-                </table>\
-              </div>\
-              '
+            '<td class="category">' +
+            v.title.replace('Final Category: ', '') +
+            '</td>'
+          out += '<td class="question">' + v.question + '</td>'
+          out += '<td class="answer">' + v.answer + '</td>'
+          out += '</tr>'
+
+          out += '<tr>'
+          out += '<td class="category">Lightning Round</td>'
+          out += '<td class="question">' + v.lightningQuestion + '</td>'
+          out += '<td class="answer">' + v.lightningAnswer + '</td>'
+          out += '</tr>'
+          out += `
+                  </tbody>
+                </table>
+              </div>
+              `
         }
       })
       $('body').append(out)
